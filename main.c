@@ -59,6 +59,8 @@ void Init_System()
 	//延时等待电源电压稳定
 	//DelayXms(200);
 	TRISA = 0x0;
+    PORTA = 0x00;
+
 	TRISC = 0x0;
 	PORTC = 0x00;
 	
@@ -102,7 +104,7 @@ void Refurbish_Sfr()
 	TRISA = 0x0;//x65;
 	TRISB = 0xFF;
 	TRISC = 0x0;
-	//PORTC = 0;
+	//PORTC = 0X00;
 	
     TRISD = 0;
 	//PORTD = 0x00;
