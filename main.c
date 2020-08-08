@@ -224,7 +224,7 @@ void main()
 	Init_System();
 	while(1)
 	{
-		if(B_MainLoop)
+		//if(B_MainLoop)
 		{
 			B_MainLoop = 0;
 			CLRWDT();
@@ -279,9 +279,10 @@ void main()
 				SEG9 = 0;	
 			}
 			Refurbish_Sfr();
-			TaskProcess();
+			
 		//	while(!(TKC0&0x40));
 		}
+		TaskProcess();
 	}
 }
 /***********************************************************
@@ -369,13 +370,54 @@ void TaskTelecStatus(void)
 ***********************************************************/
 void interrupt Isr_Timer()
 {
+	static uint16_t seconds=0,minutes=0, ptpwm_flag=0;
+	uint8_t i;
+
 	if(TMR2IF)				//若只使能了一个中断源,可以略去判断
 	{
 		TMR2IF = 0;
-		if(++MainTime >= 32)
+		if(++MainTime >= 31)
 		{
 			MainTime = 0;
 			B_MainLoop = 1;
+		//}
+		
+	  #if 1
+		seconds++;
+	  //Telec->get_8_microsecond++;
+	  ptpwm_flag=ptpwm_flag^0x1;
+  	  if(ptpwm_flag==1)
+  	  {
+  	  	//PortPwm =1;
+  	  }
+  	  else
+  	  {
+  	  	//PortPwm =0 ;
+  	  }
+	  
+	  for (i=0; i<TASKS_MAX; i++)          // 逐个任务轮询时间处理
+	  {
+	        if (TaskComps[i].Timer)          // 时间不为0
+	        {
+	            TaskComps[i].Timer--;         // 减去一个节拍
+	            if (TaskComps[i].Timer == 0)       // 时间减完了
+	            {
+	                 TaskComps[i].Timer = TaskComps[i].ItervalTime;       // 恢复计时器值，从新下一次
+	                 TaskComps[i].Run = 1;           // 任务可以运行
+	            }
+	        }
+		}
+
+		if(seconds==65536){ //计时：852ms//1.7s
+			seconds =0;
+			 minutes ++;
+			if(minutes ==71){ //1分钟时间
+				minutes =0;
+			    getMinute++; 
+		    }
+			
+		}
+	  #endif 
 		}
 	}
 	else
