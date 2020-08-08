@@ -50,7 +50,7 @@ const unsigned char Table_KeyEnable[3][4] = {
 
 //灵敏度选择,调整长短线后再用这个修正灵敏度差异,设定值不可低于5
 const unsigned char Table_KeyDown[] = {
-	10,				//按键1灵敏度设定值
+	8,				//按键1灵敏度设定值
 	7,				//按键2灵敏度设定值
 	9,				//按键3灵敏度设定值
 	10,				//按键4灵敏度设定值

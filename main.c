@@ -12,52 +12,15 @@
 -------------------------------------------*/
 #include <cms.h>
 #include "Touch_Kscan_Library.h"
+#include "input.h"
 
-#define	LED_KEY1	RB0  //KEY_TIMER 0x800
-#define	LED_KEY2	RB1  //KEY _UP   // 0x80
-#define	LED_KEY3	RB2  //KEY_DOWN //0x08
-#define	LED_KEY4	RB3  //KEY_RUN  //0X400;
-#define	LED_KEY5	RB4   //KEY_SETUP  // 0x40
-#define	LED_KEY6	RB5  //KEY_KILL // 0x04
-#define	LED_KEY7	RB6  //KEY_POWER  // 0x200
-
-#define		PCout_0 	RC0				//定义RC0口 取名Pout
-#define		PCout_1 	RC1				//定义RC0口 取名Pout
-#define		PCout_2 	RC2				//定义RC0口 取名Pout
-#define		PCout_3 	RC3				//定义RC0口 取名Pout
-
-
-#define     PDout_0  	RD0	
-#define     PDout_1  	RD1	
-#define     PDout_2  	RD2	
-#define     PDout_3  	RD3	
-#define     PDout_4  	RD4	
-#define     PDout_5  	RD5	
-#define     CONTROL  	RD6	
-#define     SEG6  	   RD7
-
-#define     SEG7     (RC0 |= (1<<0))
-#define     SEG8     (RC1 &= ~(1<<1))
-#define     SEG9     (RC2 &= ~(1<<2))
-#define     SEG10    (RC3 &= ~(1<<3))
-
-
-
-#define 	Pin0	RA0				//定义RA0口 取名Pin0
-#define 	Pin1	RA1				//定义RA1口 取名Pin1
 
 //#define	DEBUG
 
 volatile unsigned char MainTime;
 volatile bit	B_MainLoop;
 
-unsigned char keyflag_1 = 1;
-unsigned char keyflag_2 = 2;
-unsigned char keyflag_3= 3;
-unsigned char keyflag_4 = 4;
-unsigned char keyflag_5 = 5;
-unsigned char keyflag_6 = 6;
-unsigned char keyflag_7 = 7;
+
 
 //系统初始化
 void Init_System()
@@ -67,24 +30,24 @@ void Init_System()
 	INTCON = 0;				//禁止中断
 	OSCCON = 0X71;			//配置振荡为8M
 	OPTION_REG = 0;
-	
+	GPIO_Init();
 	//延时等待电源电压稳定
 	//DelayXms(200);
-	WPUA = 0B00000001;				//配置上拉情况
-	WPUB = 0B00000000;
-	WPUC = 0B00000000;
-	WPUD = 0B00000000;
+	
+	TKM1C1 = 0x10; //配置IO 口为普通GPIO口。
+	TKM2C1 = 0x10;
+	
 	
 	TRISA = 0x0;
     PORTA = 0x00;
 
-	TRISC = 0x00;
-	PORTC = 0x00;
+
+	
 	
 	TRISB = 0xff; //inpute port;
 	
 	TRISD = 0x00;
-	PORTD = 0x3f;
+	PORTD = 0x00;
 	
 	LED_KEY1 = 1;
 	LED_KEY2 = 1;
@@ -120,7 +83,7 @@ void Refurbish_Sfr()
 	
 	TRISA = 0x0;//x65;
 	TRISB = 0xFF;
-	TRISC = 0xf0;
+	TRISC = 0x0f;
 	
 	
     TRISD = 0x00;
@@ -161,44 +124,40 @@ void KeyServer()
 			switch(i)
 			{
 				
-				
-				
-				
-			
 				case 0x4: //KEY_KILL
 				
-				  keyflag_2 =1;//KEY_KILL
+				  keyflag_KILL =1;//KEY_KILL
 				  
-				   
-					 break;
+				  break;
 				case 0x8://KEY_DOWN //0x08
 				
-				     keyflag_1 =1;
+				     keyflag_DOWN =1; //
 					 break;
 			
 			
 				case 0x40://KEY_SETUP
 				
-				      keyflag_4 =1;// KEY_SETUP
+				      keyflag_SETUP =1;// KEY_SETUP
 				
 					 
 				break;
 				
 				
 			  case 0x80: //KEY _UP   // 0x100
-				     keyflag_5 =1;
+				     keyflag_UP =1;
 					break;
 					
 				case 0x200: //KEY_POWER
-				      keyflag_3 =1;////KEY_POWER  // 0X23
+				      keyflag_POWER =1;//KEY_POWER  
 					break;
 					
 				case 0x400://KEY_RUN  //0X400;
-			          keyflag_6 =1;
+			          keyflag_RUN =1;
 					break;
 					
 				case 0x800://KEY_TIMER 0x800
-				   keyflag_7 =1;
+				   keyflag_TIMER=1;
+				  
 				break;
 				
 			
@@ -263,69 +222,50 @@ void main()
 #endif			
 			
 			KeyServer();
-			if(keyflag_1 ==1){//KEY_DOWN //0x08
-				keyflag_1=0;
-				RA1 =1;
-				RD0= 0;
-				
-			};
-			if(keyflag_2 ==1){  //KEY_KILL ??
-				keyflag_2=0;
-				RA1 =0;
-				RD0= 1;
-				
-				RA3= 1;
-				RD1=0;
-				
-			};
-			if(keyflag_3 ==1){  //KE_POWER  // 0X20 ??
-				keyflag_3=0;
+			if(keyflag_DOWN ==1){//KEY_DOWN //0x08
+				keyflag_DOWN=0;
+			    
+				SEG9 = 1;	
 			
-			    RA7=0;
-				RD3=1;
 				
-				RA4= 1;
-				RD4=0;
+			}
+			if(keyflag_KILL ==1){  //KEY_KILL ??
+				keyflag_KILL=0;
+				BKLT_L =1;
 				
-				
-				
-			};
-			if(keyflag_4 ==1){// KEY_SETUP ??
-				keyflag_4=0;
-				
+			}
+			if(keyflag_POWER ==1){  //KE_POWER  
+				keyflag_POWER=0;
 			
-			    RA7=0;
-				RD3=1;
-				
-				RA4= 1;
-				RD4=0;
-				
-			};
-			if(keyflag_5 ==1){//KEY _UP   // 0x100
-				keyflag_5=0;
-			    RA7=0;
-				RD3=1;
-				
-				RA4= 1;
-				RD4=0;
-				
-			};
-			if(keyflag_6 ==1){//KEY_RUN  //0X400;
-				keyflag_6=0;
-			   
-				
-				RA4= 0;
-				RD4=1;
-				
-				RA7=1;
-				RD5= 0;
-			};
-			if(keyflag_7 ==1){//KEY_TIMER 0x800
-				keyflag_7=0;
-			    PORTD = 0x3f;
+			    BKLT_R =1;
 				
 				
-			};
+				
+			}
+			if(keyflag_SETUP ==1){// KEY_SETUP ??
+				keyflag_SETUP=0;
+				BKLT_R=0;
+			
+				
+			}
+			if(keyflag_UP ==1){//KEY _UP   // 0x100
+				keyflag_UP=0;
+			    BKLT_L=0;
+				
+			}
+			if(keyflag_RUN ==1){//KEY_RUN  //0X400;
+				keyflag_RUN=0;
+			    BKLT_POINT=1;
+			
+			}
+			if(keyflag_TIMER ==1){//KEY_TIMER 0x800
+				keyflag_TIMER=0;
+				 BKLT_POINT=0;
+			
+				BKLT_R =0;
+				BKLT_L =0;
+				SEG9 = 0;	
+			}
 			Refurbish_Sfr();
 		//	while(!(TKC0&0x40));
 		}
