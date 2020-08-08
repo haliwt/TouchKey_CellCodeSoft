@@ -4,7 +4,10 @@
 #include <cms.h>
 
 
-
+typedef unsigned char uint8_t;
+typedef unsigned int uint16_t;
+typedef int int16_t;
+typedef char int8_t;
 
 #define	LED_KEY1	RB0             //KEY_TIMER 0x800
 #define	LED_KEY2	RB1             //KEY _UP   // 0x80

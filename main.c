@@ -15,13 +15,51 @@
 #include "input.h"
 
 
-//#define	DEBUG
+#define TASK_NUM   (4)                  //  这里定义的任务数为4，表示有4个任务会使用此定时器定时。
+
+ volatile uint16_t getMinute;
+ volatile uint16_t getHour;
+
+uint16_t TaskCount[TASK_NUM] ;           //  这里为4个任务定义4个变量来存放定时值
+uint8_t  TaskMark[TASK_NUM];             //  同样对应4个标志位，为0表示时间没到，为1表示定时时间到。
+
+
+struct _TASK_COMPONENTS
+{
+    uint8_t Run;                  // 程序运行标记：0-不运行，1运行
+    uint16_t Timer;                // 计时器
+    uint16_t ItervalTime;              // 任务运行间隔时间
+    void (*TaskHook)(void);    // 要运行的任务函数
+} TASK_COMPONENTS;             // 任务定义
+
+typedef enum _TASK_LIST
+{
+    TAST_DISP_NUMBER,          // 显示数字
+    TAST_KEY_SAN,             // 按键扫描
+    TASK_RECE_IR,             // 接收IR
+    TASK_TELEC_WS,            // 同控制主板通讯
+    TASKS_MAX                 // 总的可供分配的定时任务数目
+} TASK_LIST;
+
+
+
+void TaskLEDDisplay(void);
+void TaskKeySan(void);
+void TaskReceiveIR(void);
+void TaskTelecStatus(void);
+void TaskProcess(void);
+
+static struct _TASK_COMPONENTS TaskComps[] =
+{
+    {0, 10000, 10000, TaskLEDDisplay},        // 显示数字 13ms = 13us * 10000，扫描一次
+    {0, 154, 154, TaskKeySan},               // 按键扫描 4ms=13us * 308 扫描一次
+    {0, 308, 308, TaskReceiveIR},            // 接收IR   8ms = 13us * 616 执行一次
+    {0, 65536, 65536, TaskTelecStatus}       // 同主板通讯 852ms = 13us * 65536  执行一次 
+};
+
 
 volatile unsigned char MainTime;
 volatile bit	B_MainLoop;
-
-
-
 //系统初始化
 void Init_System()
 {
@@ -33,9 +71,6 @@ void Init_System()
 	GPIO_Init();
 	//延时等待电源电压稳定
 	//DelayXms(200);
-	
-	TKM1C1 = 0x10; //配置IO 口为普通GPIO口。
-	TKM2C1 = 0x10;
 	
 	
 	TRISA = 0x0;
