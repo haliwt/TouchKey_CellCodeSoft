@@ -173,53 +173,30 @@ void KeyServer()
 	}
 }
 
-/***********************************************************
-中断服务函数
-***********************************************************/
-void interrupt Isr_Timer()
-{
-	if(TMR2IF)				//若只使能了一个中断源,可以略去判断
-	{
-		TMR2IF = 0;
-		if(++MainTime >= 32)
-		{
-			MainTime = 0;
-			B_MainLoop = 1;
-		}
-	}
-	else
-	{
-		PIR1 = 0;
-		PIR2 = 0;
 
-	}
-}
 
 /***********************************************************
-主循环
+**
+**Function Name: void main()
+**Function :
+**Input Ref:NO
+**Return Ref:NO
+**
 ***********************************************************/
 void main()
 {
-#ifdef	DEBUG
-	volatile unsigned char maxtime = 0,maxtime1 = 0;
-#endif
+
 	Init_System();
 	while(1)
 	{
-		//if(B_MainLoop)
+		if(B_MainLoop)
 		{
 			B_MainLoop = 0;
 			CLRWDT();
 			
 			CheckTouchKey();
 
-#ifdef	DEBUG			
-			maxtime1 = MainTime;
-			if(maxtime1 > maxtime)
-			{
-				maxtime = maxtime1;
-			}
-#endif			
+		
 			
 			KeyServer();
 			if(keyflag_DOWN ==1){//KEY_DOWN //0x08
@@ -269,5 +246,31 @@ void main()
 			Refurbish_Sfr();
 		//	while(!(TKC0&0x40));
 		}
+	}
+}
+/***********************************************************
+**
+**Function Name: void interrupt Isr_Timer()
+**Function :
+**Input Ref:NO
+**Return Ref:NO
+**
+***********************************************************/
+void interrupt Isr_Timer()
+{
+	if(TMR2IF)				//若只使能了一个中断源,可以略去判断
+	{
+		TMR2IF = 0;
+		if(++MainTime >= 32)
+		{
+			MainTime = 0;
+			B_MainLoop = 1;
+		}
+	}
+	else
+	{
+		PIR1 = 0;
+		PIR2 = 0;
+
 	}
 }
