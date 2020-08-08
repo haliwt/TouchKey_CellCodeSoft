@@ -279,9 +279,85 @@ void main()
 				SEG9 = 0;	
 			}
 			Refurbish_Sfr();
+			TaskProcess();
 		//	while(!(TKC0&0x40));
 		}
 	}
+}
+/***********************************************************
+	*
+	*Function Name: void TaskProcess(void)
+	*Function : process
+	*Input Ref:No
+	*Output Ref:No
+	*
+***********************************************************/
+void TaskProcess(void)
+{
+	uint8_t i;
+    for (i=0; i<TASKS_MAX; i++)           // 逐个任务轮询时间处理
+    {
+        if(TaskComps[i].Run)           // 时间不为0
+        {
+             TaskComps[i].TaskHook();         // 运行任务
+             TaskComps[i].Run = 0;          // 标志清0
+        }
+    }
+
+}
+/***********************************************************
+	*
+	*Function Name: void TaskDisplayClock(void)
+	*Function : display LED numbers
+	*Input Ref:No
+	*Output Ref:No
+	*
+***********************************************************/
+void TaskLEDDisplay(void)
+{
+   //LEDDisplay_Data();
+
+}
+/***********************************************************
+	*
+	*Function Name: void TaskKeySan(void)
+	*Function : Toch key scan 
+	*Input Ref:No
+	*Output Ref:No
+	*
+***********************************************************/
+void TaskKeySan(void)
+{
+	
+}
+/***********************************************************
+	*
+	*Function Name: void TaskReceiveIR(void)
+	*Function : receive IR logic level
+	*Input Ref:No
+	*Output Ref:No
+	*
+***********************************************************/
+void TaskReceiveIR(void)
+{
+  
+  
+
+}
+/***********************************************************************************************
+	*
+	*Function Name: void TaskTelecStatus(void)
+	*Function : ommunicate serial baud rate =9600bps
+	*Input Ref:No
+	*Output Ref:No
+	*
+*************************************************************************************************/
+void TaskTelecStatus(void)
+{
+   
+	
+   
+   // USART_SendData(data);
 }
 /***********************************************************
 **
