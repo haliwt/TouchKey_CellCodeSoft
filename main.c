@@ -293,7 +293,7 @@ Next:		Init_System();
 				keyflag_DOWN=0;
 			    
 				SEG9 = 1;	
-			   delay_10us(1000);
+			    BKLT_TIM=0;
 				
 			}
 			if(keyflag_KILL ==1){  //KEY_KILL ??
@@ -305,7 +305,7 @@ Next:		Init_System();
 				keyflag_POWER=0;
 			
 			    BKLT_R =1;
-			    delay_10us(1000);
+			   
 				
 				
 				
@@ -313,18 +313,19 @@ Next:		Init_System();
 			if(keyflag_SETUP ==1){// KEY_SETUP ??
 				keyflag_SETUP=0;
 				BKLT_R=0;
+				BKLT_TIM=0;
 			
 				
 			}
 			if(keyflag_UP ==1){//KEY _UP   // 0x100
 				keyflag_UP=0;
 			    BKLT_L=0;
-				delay_10us(1000);
+				
 			}
 			if(keyflag_RUN ==1){//KEY_RUN  //0X400;  OK
 				keyflag_RUN=0;
 			    BKLT_POINT=1;
-			    delay_10us(1000);
+			   
 			
 			}
 			if(keyflag_TIMER ==1){//KEY_TIMER 0x800
@@ -333,11 +334,17 @@ Next:		Init_System();
 			
 				BKLT_R =0;
 				BKLT_L =0;
-				SEG9 = 0;	
+				SEG9 = 0;
+				BKLT_TIM =1;
+				BKLT_POINT =0;	
 			}
 			Refurbish_Sfr();
+			TaskLEDDisplay();
 		}
-
+		
+			
+		
+		
 		
 	}
 }
@@ -372,19 +379,19 @@ void TaskProcess(void)
 ***********************************************************/
 void TaskLEDDisplay(void)
 {
-   //LEDDisplay_Data();
-   //BKLT_R=1;
-     BKLT_POINT=1;
-	 BKLT_TIM;//=1;
-	 //Init_System();
-     WriteByte(0x8b) ;
-	 WriteByte(0x01) ;	
-		
    
+     Init_Tm1650();
+	 TM1650_Set(0x68,segNumber[7]);//初始化为5级灰度，开显示
+   
+
+	TM1650_Set(0x6A,segNumber[8]);//初始化为5级灰度，开显示
+
+
+  TM1650_Set(0x6C,segNumber[1]);//初始化为5级灰度，开显示
+
 	
-
-	 
-
+   TM1650_Set(0x6E,segNumber[2]);//初始化为5级灰度，开显示
+   
 }
 /***********************************************************
 	*
