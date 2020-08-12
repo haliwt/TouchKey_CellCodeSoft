@@ -130,10 +130,10 @@ void Init28_System()
 	//DelayXms(200);
 	
 	
-	//TRISA = 0x0;
+	
     //PORTA = 0x00;
 
-		PortTx =1;
+	PortTx =1;
 	
 	
 
@@ -165,7 +165,7 @@ void Refurbish_Sfr()
 	
 	//TRISA = 0x0;//x65;
 	TRISB = 0xFF;
-	TRISC = 0x0f;
+	//TRISA = 0x0;
 	
 	
     TRISD = 0x00;
@@ -273,7 +273,7 @@ void main()
 		state =1;
         if(runTimes==0){
 			 runTimes++;
-			Init28_System();
+			 Init28_System();
 			 WriteByte(0xAB) ;
 
 			
@@ -293,7 +293,7 @@ Next:		Init_System();
 				keyflag_DOWN=0;
 			    
 				SEG9 = 1;	
-			
+			   delay_10us(1000);
 				
 			}
 			if(keyflag_KILL ==1){  //KEY_KILL ??
@@ -305,6 +305,7 @@ Next:		Init_System();
 				keyflag_POWER=0;
 			
 			    BKLT_R =1;
+			    delay_10us(1000);
 				
 				
 				
@@ -318,11 +319,12 @@ Next:		Init_System();
 			if(keyflag_UP ==1){//KEY _UP   // 0x100
 				keyflag_UP=0;
 			    BKLT_L=0;
-				
+				delay_10us(1000);
 			}
-			if(keyflag_RUN ==1){//KEY_RUN  //0X400;
+			if(keyflag_RUN ==1){//KEY_RUN  //0X400;  OK
 				keyflag_RUN=0;
 			    BKLT_POINT=1;
+			    delay_10us(1000);
 			
 			}
 			if(keyflag_TIMER ==1){//KEY_TIMER 0x800
@@ -336,40 +338,6 @@ Next:		Init_System();
 			Refurbish_Sfr();
 		}
 
-				#if 0
-					switch(state){
-						
-					case 1 :
-					 if(runTimes==0){
-						 runTimes++;
-						
-						 WriteByte(0xAB) ;
-
-						
-						goto Next;
-					 }
-					 state =2;
-					break;
-					
-			Next:	case 2: 
-			         TaskLEDDisplay();
-			            BKLT_L=1;
-					//	delay_10us(1000);
-					
-				        goto NEXT_2;
-						state=3;
-					break;
-			NEXT_2:		  case 3:
-					  
-				  	    BKLT_R=1;
-						BKLT_POINT=1;
-					    delay_10us(1000);
-						delay_10us(1000);
-						
-						state=1;
-				    break;
-					}
-				#endif 
 		
 	}
 }
@@ -476,9 +444,10 @@ void interrupt Isr_Timer()
 	//if(TMR2IF)				//若只使能了一个中断源,可以略去判断
 	{
 		TMR2IF = 0;
-	    runTimes =1;
+	  //  runTimes =1;
 		asm("nop");
-		//asm("nop");
+		asm("nop");
+		asm("nop");
 		
 	}	
 	

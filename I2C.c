@@ -63,7 +63,8 @@ void  delay_10us(uint16_t n)
     asm("nop"); //better 
     asm("nop");// below new add --standard level
    // asm("nop"); //
- 
+   /***********************/
+   
 		
 		}	
 }
