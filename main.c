@@ -266,8 +266,9 @@ void KeyServer()
 ***********************************************************/
 void main()
 {
-	uint8_t state =0,i=0;
+	uint8_t powerSt =0,timerSt=0;
 	Init_System();
+	BKLT_POINT=0;
 	while(1)
 	{
 		
@@ -304,16 +305,16 @@ Next:		Init_System();
 			if(keyflag_POWER ==1){  //KE_POWER  
 				keyflag_POWER=0;
 			
-			    state =state ^ 0x1;
-			    if(state ==1){
+			    powerSt =powerSt ^ 0x1;
+			    if(powerSt ==1){
 				    BKLT_R =1;
 				    BKLT_L =1;
-				    BKLT_TIM=0;
+				   // BKLT_TIM=0;
 			    }
 			    else{
 			    	BKLT_R =0;
 				    BKLT_L =0;
-				    BKLT_TIM=1;
+				   // BKLT_TIM=1;
 			    }
 				
 				
@@ -339,8 +340,12 @@ Next:		Init_System();
 			}
 			if(keyflag_TIMER ==1){//KEY_TIMER 0x800
 				keyflag_TIMER=0;
-				BKLT_TIM=0;
-
+				timerSt = timerSt ^ 0x01;
+				if(timerSt ==1)
+				   BKLT_TIM=0;
+				else 
+					BKLT_TIM=1; //turn off
+				//BKLT_POINT =0;
 				// BKLT_POINT=0;
 			
 				//BKLT_R =0;
