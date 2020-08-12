@@ -493,8 +493,11 @@ void interrupt Isr_Timer()
 	//---------------------------------------
 
 		T0IF = 0;			//���жϱ�־λ
-		//if(++MainTime >= 31)//3.87ms
+		if(++MainTime >= 31)//3.87ms
 		{
+			 MainTime = 0;
+			B_MainLoop = 1;
+
 			seconds++;
 				//Telec->get_8_microsecond++;
 				ptpwm_flag=ptpwm_flag^0x1;
