@@ -266,11 +266,11 @@ void KeyServer()
 ***********************************************************/
 void main()
 {
-	uint8_t state =1,i=0;
+	uint8_t state =0,i=0;
 	Init_System();
 	while(1)
 	{
-		state =1;
+		
         if(runTimes==0){
 			 runTimes++;
 			 Init28_System();
@@ -291,52 +291,63 @@ Next:		Init_System();
 			KeyServer();
 			if(keyflag_DOWN ==1){//KEY_DOWN //0x08
 				keyflag_DOWN=0;
-			    
-				SEG9 = 1;	
-			    BKLT_TIM=0;
+			     BKLT_L =1;
+				//SEG9 = 1;	
+			   // BKLT_TIM=0;
 				
 			}
 			if(keyflag_KILL ==1){  //KEY_KILL ??
 				keyflag_KILL=0;
-				BKLT_L =1;
+				BKLT_R =1;
 				
 			}
 			if(keyflag_POWER ==1){  //KE_POWER  
 				keyflag_POWER=0;
 			
-			    BKLT_R =1;
-			   
+			    state =state ^ 0x1;
+			    if(state ==1){
+				    BKLT_R =1;
+				    BKLT_L =1;
+				    BKLT_TIM=0;
+			    }
+			    else{
+			    	BKLT_R =0;
+				    BKLT_L =0;
+				    BKLT_TIM=1;
+			    }
 				
 				
 				
 			}
 			if(keyflag_SETUP ==1){// KEY_SETUP ??
 				keyflag_SETUP=0;
-				BKLT_R=0;
-				BKLT_TIM=0;
+				BKLT_R=1;
+				//BKLT_TIM=0;
 			
 				
 			}
 			if(keyflag_UP ==1){//KEY _UP   // 0x100
 				keyflag_UP=0;
-			    BKLT_L=0;
+			     BKLT_L =1;//BKLT_L=0;
 				
 			}
 			if(keyflag_RUN ==1){//KEY_RUN  //0X400;  OK
 				keyflag_RUN=0;
-			    BKLT_POINT=1;
+			    BKLT_L =1;// BKLT_POINT=1;
 			   
 			
 			}
 			if(keyflag_TIMER ==1){//KEY_TIMER 0x800
 				keyflag_TIMER=0;
-				 BKLT_POINT=0;
+				BKLT_TIM=0;
+
+				// BKLT_POINT=0;
 			
-				BKLT_R =0;
-				BKLT_L =0;
-				SEG9 = 0;
-				BKLT_TIM =1;
-				BKLT_POINT =0;	
+				//BKLT_R =0;
+				//BKLT_L =0;
+				//SEG9 = 0;
+				//BKLT_TIM =1;
+				//BKLT_POINT =0;	
 			}
 			Refurbish_Sfr();
 			TaskLEDDisplay();
