@@ -430,53 +430,6 @@ void interrupt Isr_Timer()
 		asm("nop");
 		asm("nop");
 		
-
-		//if(++MainTime >= 31)//3.87ms
-		{
-			
-			//delay_us(1);
-
-			#if 0
-			MainTime = 0;
-			B_MainLoop = 1;
-		    gBaudTime =1 ;
-			seconds++;
-				//Telec->get_8_microsecond++;
-				ptpwm_flag=ptpwm_flag^0x1;
-				if(ptpwm_flag==1)
-				{
-					//PortPwm =1;
-				}
-				else
-				{
-					//PortPwm =0 ;
-				}
-				
-				for (i=0; i<TASKS_MAX; i++)          // 逐个任务轮询时间处理
-				{
-						if (TaskComps[i].Timer)          // 时间不为0
-						{
-							TaskComps[i].Timer--;         // 减去一个节拍
-							if (TaskComps[i].Timer == 0)       // 时间减完了
-							{
-								TaskComps[i].Timer = TaskComps[i].ItervalTime;       // 恢复计时器值，从新下一次
-								TaskComps[i].Run = 1;           // 任务可以运行
-							}
-						}
-					}
-
-					if(seconds==65536){ //计时：852ms//1.7s
-						seconds =0;
-						minutes ++;
-						if(minutes ==71){ //1分钟时间
-							minutes =0;
-							getMinute++; 
-						}
-						
-					}
-				#endif 	
-	
-	}	
 	}	
 	else
 	{
