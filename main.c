@@ -13,10 +13,13 @@
 #include <cms.h>
 #include "Touch_Kscan_Library.h"
 #include "input.h"
+#include "i2c.h"
+#include "usart.h"
 
 
-#define TASK_NUM   (4)                  //  这里定义的任务数为4，表示有4个任务会使用此定时器定时。
-
+#define TASK_NUM   (5)                  //  这里定义的任务数为4，表示有4个任务会使用此定时器定时。
+ uint8_t gBaudTime = 0;
+ static uint8_t runTimes ;
  volatile uint16_t getMinute;
  volatile uint16_t getHour;
 
@@ -51,10 +54,10 @@ void TaskProcess(void);
 
 static struct _TASK_COMPONENTS TaskComps[] =
 {
-    {0, 10000, 10000, TaskLEDDisplay},        // 显示数字 13ms = 13us * 10000，扫描一次
-    {0, 154, 154, TaskKeySan},               // 按键扫描 4ms=13us * 308 扫描一次
-    {0, 308, 308, TaskReceiveIR},            // 接收IR   8ms = 13us * 616 执行一次
-    {0, 65536, 65536, TaskTelecStatus}       // 同主板通讯 852ms = 13us * 65536  执行一次 
+    {0, 300, 300, TaskLEDDisplay},        // 显示数字 125us * 1000=125ms，扫描一次
+    {0, 1000, 1000, TaskKeySan},               // 按键扫描 125us * 500= 62.5ms扫描一次
+    {0, 60000, 60000, TaskReceiveIR},            // 接收IR   125us * 60000= 3分48秒 执行一次
+    {0, 40000, 40000, TaskTelecStatus}       // 同主板通讯 852ms = 125us *4000  =2分36秒执行一次 
 };
 
 
@@ -73,16 +76,16 @@ void Init_System()
 	//DelayXms(200);
 	
 	
-	TRISA = 0x0;
-    PORTA = 0x00;
+	//TRISA = 0x0;
+    //PORTA = 0x00;
 
-
+		PortTx =1;
 	
 	
 	TRISB = 0xff; //inpute port;
 	
 	TRISD = 0x00;
-	PORTD = 0x00;
+
 	
 	LED_KEY1 = 1;
 	LED_KEY2 = 1;
@@ -94,7 +97,7 @@ void Init_System()
 	
 	PIE2 = 0;
 	PIE1 = 0x02;
-	PR2 = 250;				//8M下将TMR2设置为125us中断
+	PR2 = 28 ;//PR2 = 250;				//8M下将TMR2设置为125us中断,104us
 	T2CON = 4;				//使能定时器2
 	
 	
@@ -116,7 +119,7 @@ void Refurbish_Sfr()
 //	ANSEL = 0;
 //	ANSELH = 0;
 	
-	TRISA = 0x0;//x65;
+	//TRISA = 0x0;//x65;
 	TRISB = 0xFF;
 	TRISC = 0x0f;
 	
@@ -134,8 +137,7 @@ void Refurbish_Sfr()
 	//刷新中断相关控制寄存器
 	PIE2 = 0;
 	PIE1 = 0x02;
-	PR2 = 250;
-//	PIR1 = 0x22;
+	PR2 = 28 ;//PR2 = 250;
 	INTCON = 0XC0;
 	if(4 != T2CON)
 		T2CON = 4;
@@ -195,10 +197,6 @@ void KeyServer()
 				  
 				break;
 				
-			
-				
-				
-				
 			}
 		}
 	}
@@ -220,19 +218,26 @@ void KeyServer()
 ***********************************************************/
 void main()
 {
-
+	uint8_t state =1,i=0;
 	Init_System();
 	while(1)
 	{
-		//if(B_MainLoop)
+		state =1;
+        if(runTimes==0){
+			 runTimes++;
+			
+			 WriteByte(0xAB) ;
+
+			
+			goto Next;
+		 }
+
+	    if(B_MainLoop)
 		{
-			B_MainLoop = 0;
+Next:		B_MainLoop = 0;
 			CLRWDT();
 			
 			CheckTouchKey();
-
-		
-			
 			KeyServer();
 			if(keyflag_DOWN ==1){//KEY_DOWN //0x08
 				keyflag_DOWN=0;
@@ -279,10 +284,43 @@ void main()
 				SEG9 = 0;	
 			}
 			Refurbish_Sfr();
-			
-		//	while(!(TKC0&0x40));
 		}
-		TaskProcess();
+
+				#if 0
+					switch(state){
+						
+					case 1 :
+					 if(runTimes==0){
+						 runTimes++;
+						
+						 WriteByte(0xAB) ;
+
+						
+						goto Next;
+					 }
+					 state =2;
+					break;
+					
+			Next:	case 2: 
+			         TaskLEDDisplay();
+			            BKLT_L=1;
+					//	delay_10us(1000);
+					
+				        goto NEXT_2;
+						state=3;
+					break;
+			NEXT_2:		  case 3:
+					  
+				  	    BKLT_R=1;
+						BKLT_POINT=1;
+					    delay_10us(1000);
+						delay_10us(1000);
+						
+						state=1;
+				    break;
+					}
+				#endif 
+		
 	}
 }
 /***********************************************************
@@ -317,6 +355,17 @@ void TaskProcess(void)
 void TaskLEDDisplay(void)
 {
    //LEDDisplay_Data();
+   //BKLT_R=1;
+     BKLT_POINT=1;
+	 BKLT_TIM;//=1;
+	 //Init_System();
+     WriteByte(0x8b) ;
+	 WriteByte(0x01) ;	
+		
+   
+	
+
+	 
 
 }
 /***********************************************************
@@ -329,7 +378,7 @@ void TaskLEDDisplay(void)
 ***********************************************************/
 void TaskKeySan(void)
 {
-	
+	BKLT_L=1;
 }
 /***********************************************************
 	*
@@ -342,7 +391,9 @@ void TaskKeySan(void)
 void TaskReceiveIR(void)
 {
   
-  
+  BKLT_R=0;
+  BKLT_L=0;
+  delay_10us(1000);
 
 }
 /***********************************************************************************************
@@ -355,8 +406,7 @@ void TaskReceiveIR(void)
 *************************************************************************************************/
 void TaskTelecStatus(void)
 {
-   
-	
+     BKLT_R=1;
    
    // USART_SendData(data);
 }
@@ -376,50 +426,58 @@ void interrupt Isr_Timer()
 	if(TMR2IF)				//若只使能了一个中断源,可以略去判断
 	{
 		TMR2IF = 0;
-		if(++MainTime >= 31)
+		//delay_us(1);
+		asm("nop");
+		asm("nop");
+		
+
+		//if(++MainTime >= 31)//3.87ms
 		{
+			
+			//delay_us(1);
+
+			#if 0
 			MainTime = 0;
 			B_MainLoop = 1;
-		//}
-		
-	  #if 1
-		seconds++;
-	  //Telec->get_8_microsecond++;
-	  ptpwm_flag=ptpwm_flag^0x1;
-  	  if(ptpwm_flag==1)
-  	  {
-  	  	//PortPwm =1;
-  	  }
-  	  else
-  	  {
-  	  	//PortPwm =0 ;
-  	  }
-	  
-	  for (i=0; i<TASKS_MAX; i++)          // 逐个任务轮询时间处理
-	  {
-	        if (TaskComps[i].Timer)          // 时间不为0
-	        {
-	            TaskComps[i].Timer--;         // 减去一个节拍
-	            if (TaskComps[i].Timer == 0)       // 时间减完了
-	            {
-	                 TaskComps[i].Timer = TaskComps[i].ItervalTime;       // 恢复计时器值，从新下一次
-	                 TaskComps[i].Run = 1;           // 任务可以运行
-	            }
-	        }
-		}
+		    gBaudTime =1 ;
+			seconds++;
+				//Telec->get_8_microsecond++;
+				ptpwm_flag=ptpwm_flag^0x1;
+				if(ptpwm_flag==1)
+				{
+					//PortPwm =1;
+				}
+				else
+				{
+					//PortPwm =0 ;
+				}
+				
+				for (i=0; i<TASKS_MAX; i++)          // 逐个任务轮询时间处理
+				{
+						if (TaskComps[i].Timer)          // 时间不为0
+						{
+							TaskComps[i].Timer--;         // 减去一个节拍
+							if (TaskComps[i].Timer == 0)       // 时间减完了
+							{
+								TaskComps[i].Timer = TaskComps[i].ItervalTime;       // 恢复计时器值，从新下一次
+								TaskComps[i].Run = 1;           // 任务可以运行
+							}
+						}
+					}
 
-		if(seconds==65536){ //计时：852ms//1.7s
-			seconds =0;
-			 minutes ++;
-			if(minutes ==71){ //1分钟时间
-				minutes =0;
-			    getMinute++; 
-		    }
-			
-		}
-	  #endif 
-		}
-	}
+					if(seconds==65536){ //计时：852ms//1.7s
+						seconds =0;
+						minutes ++;
+						if(minutes ==71){ //1分钟时间
+							minutes =0;
+							getMinute++; 
+						}
+						
+					}
+				#endif 	
+	
+	}	
+	}	
 	else
 	{
 		PIR1 = 0;
@@ -427,3 +485,5 @@ void interrupt Isr_Timer()
 
 	}
 }
+	
+

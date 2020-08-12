@@ -32,7 +32,6 @@ typedef char int8_t;
 
 
 
-#define 	Pin1	RA1				//定义RA1口 取名Pin1
 
 
 unsigned char keyflag_POWER = 0;
