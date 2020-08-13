@@ -15,6 +15,9 @@ struct _KEY_STRUCT_
     uint8_t PowerSet : 1;
     uint8_t RunSet:1;
     uint8_t Set;
+    uint8_t TimeHour ;
+    uint8_t TimeMinute;
+    uint8_t TimeDecadeHour;
 };
 
 struct _KEY_STRUCT_  *keystr;

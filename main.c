@@ -20,6 +20,7 @@
 #define TASK_NUM   (5)                  //  这里定义的任务数为4，表示有4个任务会使用此定时器定时。
  uint8_t gBaudTime = 0;
  static uint8_t runTimes ;
+ static uint8_t gEvent = 0;      //g = globe
  volatile uint16_t getMinute;
  volatile uint16_t getHour;
 
@@ -46,7 +47,7 @@ typedef enum _TASK_LIST
 
 
 
-void TaskLEDDisplay(void);
+void TaskLEDDisplay(uint8_t m);
 void TaskKeySan(void);
 void TaskReceiveIR(void);
 void TaskTelecStatus(void);
@@ -211,6 +212,7 @@ void KeyServer()
 				case 0x8://KEY_DOWN //0x08
 				
 				     keyflag_DOWN =1; //
+					 gEvent =1;
 					 break;
 			
 			
@@ -224,6 +226,7 @@ void KeyServer()
 				
 			  case 0x80: //KEY _UP   // 0x100
 				     keyflag_UP =1;
+					 gEvent =1;
 					break;
 					
 				case 0x200: //KEY_POWER
@@ -260,16 +263,19 @@ void KeyServer()
 ***********************************************************/
 void main()
 {
-	uint8_t powerSt =0,timerSt=0,runSt=0;
+	uint8_t powerSt =0,timeupSt=0,runSt=0,timerSt=0,number=0;
 	Init_System();
+	 IIC_Init_TM1650();
+	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
 	BKLT_POINT=0;
+	keystr->TimerSetUp=0;
 	while(1)
 	{
 		
         if(runTimes==0){
 			 runTimes++;
 			 Init28_System();
-			 WriteByte(0xAB) ;
+			 WriteByte(0x01) ;
 			goto Next;
 		 }
 
@@ -285,8 +291,16 @@ Next:		Init_System();
 			if(keyflag_DOWN ==1){//KEY_DOWN //0x08
 				keyflag_DOWN=0;
 			     BKLT_L =1;
-				//SEG9 = 1;	
-			   // BKLT_TIM=0;
+				 if(gEvent == 1 ){
+					 
+					 gEvent =0;
+					 keystr->TimerSetDown = keystr->TimerSetDown - 10;
+					 if(keystr->TimerSetDown <=0)
+					  keystr->TimerSetDown =0;
+					  LEDDisplay_Function(keystr->TimerSetDown); 
+					  
+				 }
+				 
 				
 			}
 			if(keyflag_KILL ==1){  //KEY_KILL ??
@@ -315,18 +329,33 @@ Next:		Init_System();
 			if(keyflag_SETUP ==1){// KEY_SETUP ??
 				keyflag_SETUP=0;
 				BKLT_R=1;
-				//BKLT_TIM=0;
+				
 			
 				
 			}
 			if(keyflag_UP ==1){//KEY _UP   // 0x100
 				keyflag_UP=0;
-			     BKLT_L =1;//BKLT_L=0;
+				 timeupSt = timeupSt ^ 0x01;
+				 if(timeupSt ==1){
+			        BKLT_L =1;//BKLT_L=0;
+					number  ++ ;
+					
+					//number =5;
+					//LEDDisplay_Function(keystr->TimerSetUp); //TaskLEDDisplay();
+				 }
+				 else{
+				  BKLT_L =0;
+				  gEvent =0;
+				  number  ++ ;
+				  //LEDDisplay_Function(keystr->TimerSetUp); //TaskLEDDisplay();
+				 
+				 } 
 				
 			}
 			if(keyflag_RUN ==1){//KEY_RUN  //0X400;  OK
 				keyflag_RUN=0;
 				runSt = runSt ^ 0x01;
+				#if 0
 				if(runSt ==1){
 			        BKLT_L =1;// BKLT_POINT=1;
 					keystr->RunSet = 1;
@@ -335,7 +364,7 @@ Next:		Init_System();
 					BKLT_L = 0;
 					keystr->RunSet = 0;
 				}
-			   
+			   #endif 
 			
 			}
 			if(keyflag_TIMER ==1){//KEY_TIMER 0x800
@@ -355,7 +384,10 @@ Next:		Init_System();
 				//BKLT_POINT =0;	
 			}
 			Refurbish_Sfr();
-			TaskLEDDisplay();
+			//LEDDisplay_Function(keystr->TimerSetUp); //TaskLEDDisplay();
+			//number =keystr ->TimerSetUp ;
+			//number =5;
+			TaskLEDDisplay(number);
 		}
 		
 			
@@ -393,20 +425,21 @@ void TaskProcess(void)
 	*Output Ref:No
 	*
 ***********************************************************/
-void TaskLEDDisplay(void)
+void TaskLEDDisplay( uint8_t m )
 {
    
-     Init_Tm1650();
-	 TM1650_Set(0x68,segNumber[7]);//初始化为5级灰度，开显示
+    // Init_Tm1650();
+	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
+	TM1650_Set(0x68,segNumber[m]);//初始化为5级灰度，开显示
    
 
-	TM1650_Set(0x6A,segNumber[8]);//初始化为5级灰度，开显示
+	TM1650_Set(0x6A,segNumber[3]);//初始化为5级灰度，开显示
 
 
-  TM1650_Set(0x6C,segNumber[1]);//初始化为5级灰度，开显示
+  TM1650_Set(0x6C,segNumber[4]);//初始化为5级灰度，开显示
 
 	
-   TM1650_Set(0x6E,segNumber[2]);//初始化为5级灰度，开显示
+   TM1650_Set(0x6E,segNumber[5]);//初始化为5级灰度，开显示
    
 }
 /***********************************************************

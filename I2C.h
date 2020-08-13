@@ -37,7 +37,7 @@
 #define   seg_h  0x80      //
 
 const unsigned char segNumber[]={
-         seg_a,//seg_a+seg_b+seg_c+seg_d+seg_e+seg_f,        // char "0"  0x00
+         seg_a+seg_b+seg_c+seg_d+seg_e+seg_f,        // char "0"  0x00
          seg_b+seg_c,                                // char "1"  0x01
          seg_a+seg_b+seg_d+seg_e+seg_g,              // char "2"  0x02
          seg_a+seg_b+seg_c+seg_d+seg_g,              // char "3"  0x03
@@ -72,7 +72,7 @@ void delay_10us(uint16_t n);
 
 void LEDDisplay_Run0(void);
 void LEDDisplay_Run1(void);
-
+void LEDDisplay_Function(uint8_t number);
 
 
 

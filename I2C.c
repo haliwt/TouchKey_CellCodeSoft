@@ -303,21 +303,21 @@ void TM1650_Set(uint8_t add,uint8_t dat)
  ******************************************************************************/
 void Init_Tm1650(void)
 {
-	IIC_Init_TM1650();
+	//IIC_Init_TM1650();
 	//delay_10us(10);			//需要延时一小段时间，否则开显示会无响应
 	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
 
-  #if 1
-//	TM1650_Set(0x68,segNumber[7]);//初始化为5级灰度，开显示
+  #if 0
+	TM1650_Set(0x68,segNumber[7]);//初始化为5级灰度，开显示
    
 
-	//TM1650_Set(0x6A,segNumber[8]);//初始化为5级灰度，开显示
+	TM1650_Set(0x6A,segNumber[8]);//初始化为5级灰度，开显示
 
 
-  //TM1650_Set(0x6C,segNumber[1]);//初始化为5级灰度，开显示
+  TM1650_Set(0x6C,segNumber[1]);//初始化为5级灰度，开显示
 
 	
-  // TM1650_Set(0x6E,segNumber[2]);//初始化为5级灰度，开显示
+   TM1650_Set(0x6E,segNumber[0]);//初始化为5级灰度，开显示
     #endif 
 	
 }
@@ -340,3 +340,35 @@ void LEDDisplay_Run0(void)
  
   
 }
+
+/******************************************************************************
+ ** 
+ ** Function Name: LEDDisplay_Function(uint8_t number)
+ ** Function:    
+ ** Input Ref: number :display times numbers 
+ ** Return Ref:
+ ** 
+ ******************************************************************************/
+ void LEDDisplay_Function(uint8_t number)
+ {
+   uint8_t minute=0, hour=0,decadehour=0,uintim=0;
+ 
+    uintim =   number % 10;
+    minute  =number / 10;
+ 
+  
+ // IIC_Init_TM1650();
+	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
+	TM1650_Set(0x68,segNumber[uintim ]);//初始化为5级灰度，开显示 
+   
+
+	TM1650_Set(0x6A,segNumber[minute]);//初始化为5级灰度，开显示 minute 
+
+
+  //TM1650_Set(0x6C,segNumber[0x0B]);//初始化为5级灰度，开显示  hour
+
+	
+  //TM1650_Set(0x6E,segNumber[0x0B]);//初始化为5级灰度，开显示 decadehour
+    
+   
+ }
