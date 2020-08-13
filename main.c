@@ -3,7 +3,7 @@
 程序名称：CMS89FT628框架示例程序
 日期版本：2018/6/15 <V1.1>
 
-备注：
+备注：波特率 2400bps
 
 *本程序由 中微半导体有限公司 &应用支持部& 编写整理
 *公司网址 www.mcu.com.cn
@@ -135,12 +135,6 @@ void Init28_System()
 
 	PortTx =1;
 	
-	
-
-	
-
-	
-	
 	PIE2 = 0;
 	PIE1 = 0x02; //
 	PR2 = 28 ;//PR2 = 250;				//8M下将TMR2设置为125us中断,104us
@@ -266,7 +260,7 @@ void KeyServer()
 ***********************************************************/
 void main()
 {
-	uint8_t powerSt =0,timerSt=0;
+	uint8_t powerSt =0,timerSt=0,runSt=0;
 	Init_System();
 	BKLT_POINT=0;
 	while(1)
@@ -276,8 +270,6 @@ void main()
 			 runTimes++;
 			 Init28_System();
 			 WriteByte(0xAB) ;
-
-			
 			goto Next;
 		 }
 
@@ -334,7 +326,15 @@ Next:		Init_System();
 			}
 			if(keyflag_RUN ==1){//KEY_RUN  //0X400;  OK
 				keyflag_RUN=0;
-			    BKLT_L =1;// BKLT_POINT=1;
+				runSt = runSt ^ 0x01;
+				if(runSt ==1){
+			        BKLT_L =1;// BKLT_POINT=1;
+					keystr->RunSet = 1;
+				}
+				else{
+					BKLT_L = 0;
+					keystr->RunSet = 0;
+				}
 			   
 			
 			}
