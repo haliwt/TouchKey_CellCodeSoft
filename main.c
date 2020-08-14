@@ -207,7 +207,7 @@ void KeyServer()
 				case 0x4: //KEY_KILL
 				
 				  keyflag_KILL =1;//KEY_KILL
-				  
+				   gEvent =1;
 				  break;
 				case 0x8://KEY_DOWN //0x08
 				
@@ -219,7 +219,7 @@ void KeyServer()
 				case 0x40://KEY_SETUP
 				
 				      keyflag_SETUP =1;// KEY_SETUP
-				
+				       gEvent =1;
 					 
 				break;
 				
@@ -231,14 +231,17 @@ void KeyServer()
 					
 				case 0x200: //KEY_POWER
 				      keyflag_POWER =1;//KEY_POWER  
+					   gEvent =1;
 					break;
 					
 				case 0x400://KEY_RUN  //0X400;
 			          keyflag_RUN =1;
+					   gEvent =1;
 					break;
 					
 				case 0x800://KEY_TIMER 0x800
 				   keyflag_TIMER=1;
+				    gEvent =1;
 				  
 				break;
 				
@@ -263,8 +266,7 @@ void KeyServer()
 ***********************************************************/
 void main()
 {
-	uint8_t powerSt =0,timeupSt=0,runSt=0,timerSt=0,timedownSt=0;
-	uint8_t killSt = 0,setupSt = 0;
+	
 	Init_System();
 	 IIC_Init_TM1650();
 	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
@@ -289,7 +291,76 @@ Next:		Init_System();
 			
 			CheckTouchKey();
 			KeyServer();
-			if(keyflag_DOWN ==1){//KEY_DOWN //0x08
+			TaskKeySan();
+			
+			TaskLEDDisplay(keystr.TimeSetUp,keystr.TimeMinute,keystr.TimeDecadeHour,keystr.TimeHour);
+		}
+		
+			
+		
+		
+		
+	}
+}
+/***********************************************************
+	*
+	*Function Name: void TaskProcess(void)
+	*Function : process
+	*Input Ref:No
+	*Output Ref:No
+	*
+***********************************************************/
+void TaskProcess(void)
+{
+	uint8_t i;
+    for (i=0; i<TASKS_MAX; i++)           // 逐个任务轮询时间处理
+    {
+        if(TaskComps[i].Run)           // 时间不为0
+        {
+             TaskComps[i].TaskHook();         // 运行任务
+             TaskComps[i].Run = 0;          // 标志清0
+        }
+    }
+
+}
+/***********************************************************
+	*
+	*Function Name: void TaskDisplayClock(void)
+	*Function : display LED numbers
+	*Input Ref:No
+	*Output Ref:No
+	*
+***********************************************************/
+void TaskLEDDisplay(uint8_t m,uint8_t de, uint8_t hundred, uint8_t thousand)
+{
+   
+    // Init_Tm1650();
+	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
+	TM1650_Set(0x68,segNumber[m]);//初始化为5级灰度，开显示
+   
+
+	TM1650_Set(0x6A,segNumber[de]);//初始化为5级灰度，开显示
+
+
+  TM1650_Set(0x6C,segNumber[hundred]);//初始化为5级灰度，开显示
+
+	
+   TM1650_Set(0x6E,segNumber[thousand]);//初始化为5级灰度，开显示
+   
+}
+/***********************************************************
+	*
+	*Function Name: void TaskKeySan(void)
+	*Function : Toch key scan 
+	*Input Ref:No
+	*Output Ref:No
+	*
+***********************************************************/
+void TaskKeySan(void)
+{
+	static uint8_t powerSt =0,timeupSt=0,runSt=0,timerSt=0,timedownSt=0;
+	static uint8_t killSt = 0,setupSt = 0;
+	if(keyflag_DOWN ==1){//KEY_DOWN //0x08
 				keyflag_DOWN=0;
 				timedownSt = timedownSt ^ 0x01;
 				if(timedownSt ==1){
@@ -454,72 +525,6 @@ Next:		Init_System();
 			
 			}
 			Refurbish_Sfr();
-			TaskLEDDisplay(keystr.TimeSetUp,keystr.TimeMinute,keystr.TimeDecadeHour,keystr.TimeHour);
-		}
-		
-			
-		
-		
-		
-	}
-}
-/***********************************************************
-	*
-	*Function Name: void TaskProcess(void)
-	*Function : process
-	*Input Ref:No
-	*Output Ref:No
-	*
-***********************************************************/
-void TaskProcess(void)
-{
-	uint8_t i;
-    for (i=0; i<TASKS_MAX; i++)           // 逐个任务轮询时间处理
-    {
-        if(TaskComps[i].Run)           // 时间不为0
-        {
-             TaskComps[i].TaskHook();         // 运行任务
-             TaskComps[i].Run = 0;          // 标志清0
-        }
-    }
-
-}
-/***********************************************************
-	*
-	*Function Name: void TaskDisplayClock(void)
-	*Function : display LED numbers
-	*Input Ref:No
-	*Output Ref:No
-	*
-***********************************************************/
-void TaskLEDDisplay(uint8_t m,uint8_t de, uint8_t hundred, uint8_t thousand)
-{
-   
-    // Init_Tm1650();
-	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
-	TM1650_Set(0x68,segNumber[m]);//初始化为5级灰度，开显示
-   
-
-	TM1650_Set(0x6A,segNumber[de]);//初始化为5级灰度，开显示
-
-
-  TM1650_Set(0x6C,segNumber[hundred]);//初始化为5级灰度，开显示
-
-	
-   TM1650_Set(0x6E,segNumber[thousand]);//初始化为5级灰度，开显示
-   
-}
-/***********************************************************
-	*
-	*Function Name: void TaskKeySan(void)
-	*Function : Toch key scan 
-	*Input Ref:No
-	*Output Ref:No
-	*
-***********************************************************/
-void TaskKeySan(void)
-{
-	BKLT_L=1;
 }
 /***********************************************************
 	*
