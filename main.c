@@ -377,9 +377,8 @@ void TaskKeySan(void)
 				}
 				if(keystr.SetupOn ==1 && gEvent ==1){
 					   gEvent =0;
-						keystr.TimeBaseUint   = keystr.TimeSetDown -- ;
+						keystr.TimeBaseUint   -- ;
 						if(keystr.TimeBaseUint  ==0 || keystr.TimeBaseUint  <0){
-							keystr.TimeSetDown =0;
 							keystr.TimeBaseUint=0;
 							keystr.TimeMinute--;
 							if(keystr.TimeMinute <=0){
@@ -399,12 +398,11 @@ void TaskKeySan(void)
 					}
 					else if(gEvent ==1){
 						gEvent =0;
-						if(keystr.TimeBaseUint >0)
-						   keystr.TimeBaseUint = keystr.windLevel -- ;
+						if(keystr.windLevel >0)
+						    keystr.windLevel -- ;
 						else {
-						 keystr.TimeBaseUint=minWind;
-						 keystr.windLevel =minWind;
-					   }
+						     keystr.windLevel =minWind;
+					     }
 					}
 			}
 			if(keyflag_KILL ==1){  //KEY_KILL ??
@@ -463,9 +461,8 @@ void TaskKeySan(void)
 					 
 				if(keystr.SetupOn ==1 && gEvent ==1){
 					gEvent =0;
-					keystr.TimeBaseUint = keystr.TimeSetUp ++ ;
-					if(keystr.TimeBaseUint  == 10){
-						keystr.TimeSetUp =0;
+					keystr.TimeBaseUint ++ ;
+					if(keystr.TimeBaseUint == 10){
 						keystr.TimeBaseUint=0;
 						keystr.TimeMinute++;
 						if(keystr.TimeMinute==10){
