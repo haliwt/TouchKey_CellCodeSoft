@@ -109,8 +109,8 @@ void Init_System()
 
 	PIE2 = 0;
 	PIE1 = 0x0;
-	INTCON = 0XC0;			//使能中断
-
+	//INTCON = 0XC0;			//使能中断
+	INTCON = 0xA0;	
 }
 /**********************************************************
 函数名称：
@@ -182,7 +182,7 @@ void Refurbish_Sfr()
 	PIE1 = 0x0;
 
 	PIE2 = 0;
-	INTCON = 0XC0;			//使能中断
+	INTCON = 0xA0;	//INTCON = 0XC0;			//使能中断
 	
 }
 
@@ -323,40 +323,7 @@ void TaskProcess(void)
     }
 
 }
-/***********************************************************
-	*
-	*Function Name: void TaskDisplayClock(void)
-	*Function : display LED numbers
-	*Input Ref:No
-	*Output Ref:No
-	*
-***********************************************************/
-void TaskLEDDisplay(void)
-{
-   
-    // Init_Tm1650();
-	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
-	if(keystr.SetupOn ==1 && keystr.TimerOn ==0)
-	  TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);//初始化为5级灰度，开显示
-    else{
-		
-		if(keystr.TimerOn ==1){
-			keystr.TimeBaseUint =keystr.TimeBaseUint -getMinute ;
-			 TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);//初始化为5级灰度，开显示
-		}
-		else 
-		TM1650_Set(0x68,segNumber[keystr.windLevel]);//显示风速，级别 
-	}
 
-	TM1650_Set(0x6A,segNumber[keystr.TimeMinute]);//初始化为5级灰度，开显示
-
-
-  TM1650_Set(0x6C,segNumber[keystr.TimeDecadeHour]);//初始化为5级灰度，开显示
-
-	
-   TM1650_Set(0x6E,segNumber[keystr.TimeHour]);//初始化为5级灰度，开显示
-   
-}
 /***********************************************************
 	*
 	*Function Name: void TaskKeySan(void)
@@ -460,7 +427,7 @@ void TaskKeySan(void)
 				if(setupSt == 1){
 				 BKLT_R=1;
 				 keystr.SetupOn =1;
-				 keystr.TimerOn =0;
+				 BKLT_TIM=1; //turn off
 				}
 				else{
 					 BKLT_R=0;
@@ -523,6 +490,7 @@ void TaskKeySan(void)
 				if(runSt ==1){
 			        BKLT_L =1;// BKLT_POINT=1;
 					keystr.RunOn =1;
+					getMinute=0;
 				}
 				else{
 					BKLT_L = 0;
@@ -544,6 +512,44 @@ void TaskKeySan(void)
 			}
 			Refurbish_Sfr();
 			keystr.SendData = keystr.PowerOn << 7 | keystr.RunOn << 6 | keystr.KillOn << 5 | keystr.windLevel ;
+}
+/***********************************************************
+	*
+	*Function Name: void TaskDisplayClock(void)
+	*Function : display LED numbers
+	*Input Ref:No
+	*Output Ref:No
+	*
+***********************************************************/
+void TaskLEDDisplay(void)
+{
+   
+    // Init_Tm1650();
+	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
+	if(keystr.SetupOn ==1 ){
+		
+		if(keystr.TimerOn ==1){
+			runTimes = 0x0A;
+			keystr.TimeBaseUint =keystr.TimeBaseUint -getMinute ;
+			if(getMinute >=1)getMinute =0;
+		}
+		
+	    TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);//初始化为5级灰度，开显示
+	}
+    else {
+		
+		TM1650_Set(0x68,segNumber[keystr.windLevel]);//显示风速，级别 
+	}
+	
+
+	TM1650_Set(0x6A,segNumber[keystr.TimeMinute]);//初始化为5级灰度，开显示
+
+
+  TM1650_Set(0x6C,segNumber[keystr.TimeDecadeHour]);//初始化为5级灰度，开显示
+
+	
+   TM1650_Set(0x6E,segNumber[keystr.TimeHour]);//初始化为5级灰度，开显示
+   
 }
 /***********************************************************
 	*
@@ -615,7 +621,7 @@ void interrupt Isr_Timer()
 			 MainTime = 0;
 			B_MainLoop = 1;
 
-			
+			  #if 1
 				//Telec->get_8_microsecond++;
 				ptpwm_flag=ptpwm_flag^0x1;
 				if(ptpwm_flag==1)
@@ -639,7 +645,7 @@ void interrupt Isr_Timer()
 							}
 						}
 					}
-
+				#endif 
 					if(seconds >=8000){ //1s
 						seconds =0;
 						minutes ++;
