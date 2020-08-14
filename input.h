@@ -24,6 +24,7 @@ struct _KEY_STRUCT_
     int8_t windLevel;
     uint8_t TimeSetUp;
     uint8_t TimeSetDown;
+    uint8_t SendData ;
 };
 
 struct  _KEY_STRUCT_   keystr;

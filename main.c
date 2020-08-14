@@ -278,7 +278,7 @@ void main()
         if(runTimes==0){
 			 runTimes++;
 			 Init28_System();
-			 WriteByte(0x01) ;
+			 WriteByte(keystr.SendData) ;
 			goto Next;
 		 }
 
@@ -408,9 +408,9 @@ void TaskKeySan(void)
 							
 						}
 					}
-					else if(gEvent ==1){
+					else if(gEvent ==1){ //风速递减
 						gEvent =0;
-						if(keystr.windLevel >0)
+						if(keystr.windLevel >minWind)
 						    keystr.windLevel -- ;
 						else {
 						     keystr.windLevel =minWind;
@@ -422,10 +422,12 @@ void TaskKeySan(void)
 				killSt =killSt ^ 0x01;
 				if(killSt ==1){
 				 	BKLT_R =1;
+					keystr.KillOn =1;
 					
 				}
 				else{
 					BKLT_R =0;
+					keystr.KillOn = 0;
 				}
 			}
 			if(keyflag_POWER ==1){  //KE_POWER  
@@ -435,12 +437,12 @@ void TaskKeySan(void)
 			    if(powerSt ==1){
 				    BKLT_R =1;
 				    BKLT_L =1;
-				   // BKLT_TIM=0;
+				    keystr.PowerOn =1;
 			    }
 			    else{
 			    	BKLT_R =0;
 				    BKLT_L =0;
-				   // BKLT_TIM=1;
+				    keystr.PowerOn =0;
 			    }
 				
 				
@@ -500,8 +502,8 @@ void TaskKeySan(void)
 				else if(gEvent ==1){
 					 	gEvent =0;
 						keystr.windLevel ++ ;
-					   if(keystr.windLevel ==6){
-						   keystr.windLevel =0;
+					   if(keystr.windLevel >maxWind){
+						   keystr.windLevel = minWind;
 					   }
 						
 				}
@@ -513,11 +515,11 @@ void TaskKeySan(void)
 			
 				if(runSt ==1){
 			        BKLT_L =1;// BKLT_POINT=1;
-					
+					keystr.RunOn =1;
 				}
 				else{
 					BKLT_L = 0;
-					
+					keystr.RunOn =0;
 				}
 			  
 			
@@ -532,6 +534,7 @@ void TaskKeySan(void)
 			
 			}
 			Refurbish_Sfr();
+			keystr.SendData = keystr.PowerOn << 7 | keystr.RunOn << 6 | keystr.KillOn << 5 | keystr.windLevel ;
 }
 /***********************************************************
 	*
