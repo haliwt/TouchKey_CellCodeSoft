@@ -336,8 +336,11 @@ void TaskLEDDisplay(uint8_t m,uint8_t de, uint8_t hundred, uint8_t thousand)
    
     // Init_Tm1650();
 	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
-	TM1650_Set(0x68,segNumber[m]);//初始化为5级灰度，开显示
-   
+	if(keystr.SetupOn ==1)
+	  TM1650_Set(0x68,segNumber[m]);//初始化为5级灰度，开显示
+    else{
+		TM1650_Set(0x68,segNumber[keystr.windLevel]);//显示风速，级别 
+	}
 
 	TM1650_Set(0x6A,segNumber[de]);//初始化为5级灰度，开显示
 
@@ -453,7 +456,7 @@ void TaskKeySan(void)
 					else{
 					
 					    keystr.windLevel ++ ;
-					   if(keystr.windLevel ==5){
+					   if(keystr.windLevel ==6){
 						   keystr.windLevel =0;
 					   }
 						
@@ -491,7 +494,7 @@ void TaskKeySan(void)
 					}
 				    else{
 						keystr.windLevel ++ ;
-					   if(keystr.windLevel ==5){
+					   if(keystr.windLevel ==6){
 						   keystr.windLevel =0;
 					   }
 						
