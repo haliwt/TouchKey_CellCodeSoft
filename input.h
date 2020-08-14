@@ -26,6 +26,7 @@ struct _KEY_STRUCT_
     uint8_t TimeSetUp;
     uint8_t TimeSetDown;
     uint8_t SendData ;
+    uint8_t TimerTim; 
 };
 
 struct  _KEY_STRUCT_   keystr;

@@ -175,7 +175,7 @@ void Refurbish_Sfr()
 	//---------------------------------------
 	OPTION_REG = 0xD0;		//Timer0ʹ���ڲ�ʱ��Focs/4��Ԥ��Ƶ��Ϊ1:2
 	TMR0 = 131;				//������ʼֵ
-	PIE1 = 0x0;
+
 	//INTCON = 0xA0;			//��������δ�����ε��жϡ���ֹ�����жϣ�ʹ��Timer0
 //---------------------------------------
 	
@@ -377,8 +377,6 @@ void TaskKeySan(void)
 									
 								}
 							}	
-							
-							
 						}
 					}
 					else if(gEvent ==1){ //风速递减
@@ -530,25 +528,48 @@ void TaskLEDDisplay(void)
    
     // Init_Tm1650();
 	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
-	if(keystr.SetupOn ==1 ){
+	
+	if(keystr.TimerOn ==1){
 		
-		 TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);//初始化为5级灰度，开显示
-	}
-    else {
+							runTimes = 0x05;
+		  	               if(keystr.TimerTim==1){
+							if(keystr.TimeMinute >=1){
+								keystr.TimeBaseUint =9;
+								keystr.TimeMinute--;
+								keystr.TimerTim=0;
+							}
+							else keystr.TimeBaseUint=0;
+							
+							if(keystr.TimeMinute <=0){
+								if(keystr.TimeDecadeHour>=1){
+									keystr.TimeDecadeHour --;
+									keystr.TimeMinute=9;
+								}
+								else keystr.TimeMinute =0;
+								
+								if(keystr.TimeDecadeHour <=0){
+								if(keystr.TimeHour>=1){
+									keystr.TimeHour --;
+									keystr.TimeDecadeHour=9;
+								}
+								else keystr.TimeDecadeHour =0;
+									
+									if(keystr.TimeHour <=0)
+										keystr.TimeHour =0;
+									
+								}
+							}	
+			}
+			TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);
 		
-		if(keystr.TimerOn ==1){
-			runTimes = 0x0A;
-			keystr.TimeBaseUint =keystr.TimeBaseUint -getMinute ;
-			if(getMinute >=1)getMinute =0;
-		}
-		 TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);//初始化为5级灰度，开显示
-	   
 	}
+	else 
+  		TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);//初始化为5级灰度，开显示
+   
+   TM1650_Set(0x6A,segNumber[keystr.TimeMinute]);//初始化为5级灰度，开显示
 
-	TM1650_Set(0x6A,segNumber[keystr.TimeMinute]);//初始化为5级灰度，开显示
 
-
-  TM1650_Set(0x6C,segNumber[keystr.TimeDecadeHour]);//初始化为5级灰度，开显示
+   TM1650_Set(0x6C,segNumber[keystr.TimeDecadeHour]);//初始化为5级灰度，开显示
 
    if(keystr.windMask == 1)TM1650_Set(0x6E,segNumber[keystr.windLevel]);//显示风速，级别 
    else 
@@ -599,14 +620,15 @@ void interrupt Isr_Timer()
 	uint8_t i;
 
 	//if(TMR2IF)				//若只使能了一个中断源,可以略去判断
-	{
+	//{
 		TMR2IF = 0;
 	  //  runTimes =1;
 		asm("nop");
 		asm("nop");
-		asm("nop");
+		asm("nop");///add 
 		
-	}	
+		
+	//}	
 	
 
 
@@ -620,11 +642,26 @@ void interrupt Isr_Timer()
 
 		T0IF = 0;			//���жϱ�־λ
 		seconds++;
-		if(++MainTime >= 31 || seconds >= 8000)//3.87ms
+		if(++MainTime >= 31 || seconds >= 4000)//3.87ms
 		{
 			 MainTime = 0;
 			B_MainLoop = 1;
+			
+			if(seconds >=4000){ //1s
+						seconds =0;
+						minutes ++;
+						if(minutes ==120){ //1 minute
+							minutes =0;
+							if(keystr.TimerOn==1){
+							     keystr.TimeBaseUint --;
+								 if(keystr.TimeBaseUint ==0){
+									 keystr.TimerTim =1;
+									 keystr.TimeBaseUint=9;
+							}
+						}
 
+			  }
+			}
 			  #if 1
 				//Telec->get_8_microsecond++;
 				ptpwm_flag=ptpwm_flag^0x1;
@@ -650,15 +687,7 @@ void interrupt Isr_Timer()
 						}
 					}
 				#endif 
-					if(seconds >=8000){ //1s
-						seconds =0;
-						minutes ++;
-						if(minutes ==60){ //1 minute
-							minutes =0;
-							getMinute++;
-						}
-
-					}
+					
 		}
 	}
 	else
@@ -667,7 +696,8 @@ void interrupt Isr_Timer()
 		PIR2 = 0;
 
 	}
-}
-}
 	
+}
+
+}	
 
