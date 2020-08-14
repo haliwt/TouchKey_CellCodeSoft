@@ -383,6 +383,7 @@ void TaskKeySan(void)
 					}
 					else if(gEvent ==1){ //风速递减
 						gEvent =0;
+						keystr.windMask = 1;
 						if(keystr.windLevel >minWind && keystr.windLevel <=maxWind)
 						    keystr.windLevel -- ;
 						else {
@@ -428,6 +429,7 @@ void TaskKeySan(void)
 				 BKLT_R=1;
 				 keystr.SetupOn =1;
 				 BKLT_TIM=1; //turn off
+				 keystr.windMask = 0;
 				}
 				else{
 					 BKLT_R=0;
@@ -475,6 +477,7 @@ void TaskKeySan(void)
 				}
 				else if(gEvent ==1){
 					 	gEvent =0;
+						keystr.windMask = 1;
 						keystr.windLevel ++ ;
 					   if(keystr.windLevel >maxWind){
 						   keystr.windLevel = minWind;
@@ -505,6 +508,7 @@ void TaskKeySan(void)
 				if(timerSt ==1){
 				   BKLT_TIM=0;
 				   keystr.TimerOn =1;
+				   keystr.windMask = 0;
 				}
 				else 
 					BKLT_TIM=1; //turn off
@@ -528,27 +532,27 @@ void TaskLEDDisplay(void)
 	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
 	if(keystr.SetupOn ==1 ){
 		
+		 TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);//初始化为5级灰度，开显示
+	}
+    else {
+		
 		if(keystr.TimerOn ==1){
 			runTimes = 0x0A;
 			keystr.TimeBaseUint =keystr.TimeBaseUint -getMinute ;
 			if(getMinute >=1)getMinute =0;
 		}
-		
-	    TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);//初始化为5级灰度，开显示
+		 TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);//初始化为5级灰度，开显示
+	   
 	}
-    else {
-		
-		TM1650_Set(0x68,segNumber[keystr.windLevel]);//显示风速，级别 
-	}
-	
 
 	TM1650_Set(0x6A,segNumber[keystr.TimeMinute]);//初始化为5级灰度，开显示
 
 
   TM1650_Set(0x6C,segNumber[keystr.TimeDecadeHour]);//初始化为5级灰度，开显示
 
-	
-   TM1650_Set(0x6E,segNumber[keystr.TimeHour]);//初始化为5级灰度，开显示
+   if(keystr.windMask == 1)TM1650_Set(0x6E,segNumber[keystr.windLevel]);//显示风速，级别 
+   else 
+    TM1650_Set(0x6E,segNumber[keystr.TimeHour]);//初始化为5级灰度，开显示
    
 }
 /***********************************************************

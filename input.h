@@ -16,6 +16,7 @@ struct _KEY_STRUCT_
     uint8_t KillOn : 1;      //???? ---???
     uint8_t PowerOn : 1;     //????----???
     uint8_t RunOn: 1;       //????----???
+    uint8_t windMask :1;
     
     uint8_t TimeBaseUint;    //
     uint8_t TimeHour ;
@@ -45,7 +46,7 @@ enum wind{minWind,smallWind,middleWind,moreWind,maxWind};
 #define	LED_KEY6	RB5             //KEY_KILL // 0x04
 #define	LED_KEY7	RB6             //KEY_POWER  // 0x200
 
-#define     SEG9        RA3            //¶ÎÑ¡µÄSEG9 
+#define     SEG9        RA3            //ï¿½ï¿½Ñ¡ï¿½ï¿½SEG9 
 #define     COM0_RUN  	RD0	           //COM0_RUN
 #define     COM1_RUN  	RD1	
 
