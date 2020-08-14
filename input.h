@@ -10,8 +10,8 @@ typedef char int8_t;
 
 struct _KEY_STRUCT_
 {
-    uint8_t TimerSetUp;
-    uint8_t TimerSetDown;
+    uint8_t TimeSetUp;
+    uint8_t TimeSetDown;
     uint8_t PowerSet : 1;
     uint8_t RunSet:1;
     uint8_t Set;
@@ -20,7 +20,8 @@ struct _KEY_STRUCT_
     uint8_t TimeDecadeHour;
 };
 
-struct _KEY_STRUCT_  *keystr;
+struct  _KEY_STRUCT_   keystr;
+
 
 
 

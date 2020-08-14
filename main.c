@@ -3,7 +3,7 @@
 程序名称：CMS89FT628框架示例程序
 日期版本：2018/6/15 <V1.1>
 
-备注：
+备注：波特率 2400bps
 
 *本程序由 中微半导体有限公司 &应用支持部& 编写整理
 *公司网址 www.mcu.com.cn
@@ -20,6 +20,7 @@
 #define TASK_NUM   (5)                  //  这里定义的任务数为4，表示有4个任务会使用此定时器定时。
  uint8_t gBaudTime = 0;
  static uint8_t runTimes ;
+ static uint8_t gEvent = 0;      //g = globe
  volatile uint16_t getMinute;
  volatile uint16_t getHour;
 
@@ -46,7 +47,7 @@ typedef enum _TASK_LIST
 
 
 
-void TaskLEDDisplay(void);
+void TaskLEDDisplay(uint8_t m,uint8_t de, uint8_t hundred, uint8_t thousand);
 void TaskKeySan(void);
 void TaskReceiveIR(void);
 void TaskTelecStatus(void);
@@ -129,7 +130,12 @@ void Init28_System()
 	//延时等待电源电压稳定
 	//DelayXms(200);
 	
+	
+	
+    //PORTA = 0x00;
+
 	PortTx =1;
+	
 	PIE2 = 0;
 	PIE1 = 0x02; //
 	PR2 = 28 ;//PR2 = 250;				//8M下将TMR2设置为125us中断,104us
@@ -206,6 +212,7 @@ void KeyServer()
 				case 0x8://KEY_DOWN //0x08
 				
 				     keyflag_DOWN =1; //
+					 gEvent =1;
 					 break;
 			
 			
@@ -219,6 +226,7 @@ void KeyServer()
 				
 			  case 0x80: //KEY _UP   // 0x100
 				     keyflag_UP =1;
+					 gEvent =1;
 					break;
 					
 				case 0x200: //KEY_POWER
@@ -255,19 +263,20 @@ void KeyServer()
 ***********************************************************/
 void main()
 {
-	uint8_t powerSt =0,timerSt=0;
+	uint8_t powerSt =0,timeupSt=0,runSt=0,timerSt=0,number=0;
 	Init_System();
+	 IIC_Init_TM1650();
+	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
 	BKLT_POINT=0;
+
 	while(1)
 	{
 		
         if(runTimes==0){
 			 runTimes++;
 			 Init28_System();
-			 WriteByte(0xAB) ;
-			 
-			 
-			 goto Next;
+			 WriteByte(0x01) ;
+			goto Next;
 		 }
 
 	    if(B_MainLoop)
@@ -282,8 +291,10 @@ Next:		Init_System();
 			if(keyflag_DOWN ==1){//KEY_DOWN //0x08
 				keyflag_DOWN=0;
 			     BKLT_L =1;
-				//SEG9 = 1;	
-			   // BKLT_TIM=0;
+				 if(gEvent == 1 ){
+					 gEvent =0;
+				 }
+				 
 				
 			}
 			if(keyflag_KILL ==1){  //KEY_KILL ??
@@ -312,19 +323,87 @@ Next:		Init_System();
 			if(keyflag_SETUP ==1){// KEY_SETUP ??
 				keyflag_SETUP=0;
 				BKLT_R=1;
-				//BKLT_TIM=0;
+				
 			
 				
 			}
 			if(keyflag_UP ==1){//KEY _UP   // 0x100
 				keyflag_UP=0;
-			     BKLT_L =1;//BKLT_L=0;
+				 timeupSt = timeupSt ^ 0x01;
+				 if(timeupSt ==1){
+			        BKLT_L =1;//BKLT_L=0;
+					 gEvent =0;
+				
+					keystr.TimeSetUp ++ ;
+					if(keystr.TimeSetUp == 10){
+						 keystr.TimeSetUp =0;
+						 keystr.TimeMinute++;
+						 if(keystr.TimeMinute==10){
+							 keystr.TimeMinute =0;
+							 keystr.TimeDecadeHour ++;
+							 if(keystr.TimeDecadeHour ==10){
+								 keystr.TimeDecadeHour =0;
+								 keystr.TimeHour ++;
+								 if(keystr.TimeHour == 2){
+									if(keystr.TimeDecadeHour ==4){
+									   keystr.TimeHour =0;
+									   keystr.TimeDecadeHour =0;
+									   keystr.TimeMinute =0;
+									   keystr.TimeSetUp=0;
+									}
+								 }
+							 }
+						 }	
+						
+						
+					}
+				
+				}
+				 else{
+				  BKLT_L =0;
+				  gEvent =0;
+				  keystr.TimeSetUp ++ ;
+					if(keystr.TimeSetUp == 10){
+						 keystr.TimeSetUp =0;
+						 keystr.TimeMinute++;
+						 if(keystr.TimeMinute==10){
+							 keystr.TimeMinute =0;
+							 keystr.TimeDecadeHour ++;
+							 if(keystr.TimeDecadeHour ==10){
+								 keystr.TimeDecadeHour =0;
+								 keystr.TimeHour ++;
+								 if(keystr.TimeHour == 2){
+									if(keystr.TimeDecadeHour ==4){
+									   keystr.TimeHour =0;
+									   keystr.TimeDecadeHour =0;
+									   keystr.TimeMinute =0;
+									   keystr.TimeSetUp=0;
+									}
+								 }
+							 }
+						 }	
+						
+						
+					}
+				 
+				 
+				 
+				 } 
 				
 			}
 			if(keyflag_RUN ==1){//KEY_RUN  //0X400;  OK
 				keyflag_RUN=0;
-			    BKLT_L =1;// BKLT_POINT=1;
-			   
+				runSt = runSt ^ 0x01;
+				#if 0
+				if(runSt ==1){
+			        BKLT_L =1;// BKLT_POINT=1;
+					keyPtstr->RunSet = 1;
+				}
+				else{
+					BKLT_L = 0;
+					keyPtstr->RunSet = 0;
+				}
+			   #endif 
 			
 			}
 			if(keyflag_TIMER ==1){//KEY_TIMER 0x800
@@ -334,18 +413,10 @@ Next:		Init_System();
 				   BKLT_TIM=0;
 				else 
 					BKLT_TIM=1; //turn off
-				//BKLT_POINT =0;
-				// BKLT_POINT=0;
 			
-				//BKLT_R =0;
-				//BKLT_L =0;
-				//SEG9 = 0;
-				//BKLT_TIM =1;
-				//BKLT_POINT =0;	
 			}
 			Refurbish_Sfr();
-			TaskLEDDisplay();
-			
+			TaskLEDDisplay(keystr.TimeSetUp,keystr.TimeMinute,keystr.TimeDecadeHour,keystr.TimeHour);
 		}
 		
 			
@@ -383,20 +454,21 @@ void TaskProcess(void)
 	*Output Ref:No
 	*
 ***********************************************************/
-void TaskLEDDisplay(void)
+void TaskLEDDisplay(uint8_t m,uint8_t de, uint8_t hundred, uint8_t thousand)
 {
    
-     Init_Tm1650();
-	 TM1650_Set(0x68,segNumber[7]);//初始化为5级灰度，开显示
+    // Init_Tm1650();
+	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
+	TM1650_Set(0x68,segNumber[m]);//初始化为5级灰度，开显示
    
 
-	TM1650_Set(0x6A,segNumber[8]);//初始化为5级灰度，开显示
+	TM1650_Set(0x6A,segNumber[de]);//初始化为5级灰度，开显示
 
 
-  TM1650_Set(0x6C,segNumber[1]);//初始化为5级灰度，开显示
+  TM1650_Set(0x6C,segNumber[hundred]);//初始化为5级灰度，开显示
 
 	
-   TM1650_Set(0x6E,segNumber[2]);//初始化为5级灰度，开显示
+   TM1650_Set(0x6E,segNumber[thousand]);//初始化为5级灰度，开显示
    
 }
 /***********************************************************
@@ -492,7 +564,20 @@ void interrupt Isr_Timer()
 					//PortPwm =0 ;
 				}
 
-				if(seconds==65536){ //��ʱ��852ms//1.7s
+				for (i=0; i<TASKS_MAX; i++)          // ����������ѯʱ�䴦��
+				{
+						if (TaskComps[i].Timer)          // ʱ�䲻Ϊ0
+						{
+							TaskComps[i].Timer--;         // ��ȥһ������
+							if (TaskComps[i].Timer == 0)       // ʱ��������
+							{
+								TaskComps[i].Timer = TaskComps[i].ItervalTime;       // �ָ���ʱ��ֵ��������һ��
+								TaskComps[i].Run = 1;           // ������������
+							}
+						}
+					}
+
+					if(seconds==65536){ //��ʱ��852ms//1.7s
 						seconds =0;
 						minutes ++;
 						if(minutes ==71){ //1����ʱ��
