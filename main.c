@@ -379,14 +379,26 @@ void TaskKeySan(void)
 					   gEvent =0;
 						keystr.TimeBaseUint   -- ;
 						if(keystr.TimeBaseUint  ==0 || keystr.TimeBaseUint  <0){
-							keystr.TimeBaseUint=0;
-							keystr.TimeMinute--;
+							if(keystr.TimeMinute >=1){
+								keystr.TimeBaseUint =9;
+								keystr.TimeMinute--;
+							}
+							else keystr.TimeBaseUint=0;
+							
 							if(keystr.TimeMinute <=0){
-								keystr.TimeMinute =0;
-								keystr.TimeDecadeHour --;
+								if(keystr.TimeDecadeHour>=1){
+									keystr.TimeDecadeHour --;
+									keystr.TimeMinute=9;
+								}
+								else keystr.TimeMinute =0;
+								
 								if(keystr.TimeDecadeHour <=0){
-									keystr.TimeDecadeHour =0;
+								if(keystr.TimeHour>=1){
 									keystr.TimeHour --;
+									keystr.TimeDecadeHour=9;
+								}
+								else keystr.TimeDecadeHour =0;
+									
 									if(keystr.TimeHour <=0)
 										keystr.TimeHour =0;
 									
