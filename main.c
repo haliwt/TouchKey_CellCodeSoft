@@ -410,7 +410,7 @@ void TaskKeySan(void)
 					}
 					else if(gEvent ==1){ //风速递减
 						gEvent =0;
-						if(keystr.windLevel >minWind)
+						if(keystr.windLevel >minWind && keystr.windLevel <=maxWind)
 						    keystr.windLevel -- ;
 						else {
 						     keystr.windLevel =minWind;

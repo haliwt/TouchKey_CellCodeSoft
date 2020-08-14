@@ -28,7 +28,7 @@ struct _KEY_STRUCT_
 };
 
 struct  _KEY_STRUCT_   keystr;
-enum wind{minWind,smallWind,middleWind,moreWind,largerWind,maxWind};
+enum wind{minWind,smallWind,middleWind,moreWind,maxWind};
 
 
 
