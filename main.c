@@ -21,8 +21,8 @@
  uint8_t gBaudTime = 0;
  static uint8_t runTimes ;
  static uint8_t gEvent = 0;      //g = globe
- volatile uint16_t getMinute;
- volatile uint16_t getHour;
+ static uint16_t getMinute=0;
+ static uint16_t getHour=0;
 
 uint16_t TaskCount[TASK_NUM] ;           //  这里为4个任务定义4个变量来存放定时值
 uint8_t  TaskMark[TASK_NUM];             //  同样对应4个标志位，为0表示时间没到，为1表示定时时间到。
@@ -336,9 +336,15 @@ void TaskLEDDisplay(void)
    
     // Init_Tm1650();
 	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
-	if(keystr.SetupOn ==1)
+	if(keystr.SetupOn ==1 && keystr.TimerOn ==0)
 	  TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);//初始化为5级灰度，开显示
     else{
+		
+		if(keystr.TimerOn ==1){
+			keystr.TimeBaseUint =keystr.TimeBaseUint -getMinute ;
+			 TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);//初始化为5级灰度，开显示
+		}
+		else 
 		TM1650_Set(0x68,segNumber[keystr.windLevel]);//显示风速，级别 
 	}
 
@@ -454,6 +460,7 @@ void TaskKeySan(void)
 				if(setupSt == 1){
 				 BKLT_R=1;
 				 keystr.SetupOn =1;
+				 keystr.TimerOn =0;
 				}
 				else{
 					 BKLT_R=0;
@@ -527,11 +534,13 @@ void TaskKeySan(void)
 			if(keyflag_TIMER ==1){//KEY_TIMER 0x800
 				keyflag_TIMER=0;
 				timerSt = timerSt ^ 0x01;
-				if(timerSt ==1)
+				if(timerSt ==1){
 				   BKLT_TIM=0;
+				   keystr.TimerOn =1;
+				}
 				else 
 					BKLT_TIM=1; //turn off
-			
+					keystr.TimerOn =0;
 			}
 			Refurbish_Sfr();
 			keystr.SendData = keystr.PowerOn << 7 | keystr.RunOn << 6 | keystr.KillOn << 5 | keystr.windLevel ;
@@ -601,7 +610,7 @@ void interrupt Isr_Timer()
 
 		T0IF = 0;			//���жϱ�־λ
 		seconds++;
-		if(++MainTime >= 31 || seconds == 48000)//3.87ms
+		if(++MainTime >= 31 || seconds >= 8000)//3.87ms
 		{
 			 MainTime = 0;
 			B_MainLoop = 1;
@@ -631,10 +640,10 @@ void interrupt Isr_Timer()
 						}
 					}
 
-					if(seconds==48000){ //��ʱ��852ms//1.7s
+					if(seconds >=8000){ //1s
 						seconds =0;
 						minutes ++;
-						if(minutes ==71){ //1����ʱ��
+						if(minutes ==60){ //1 minute
 							minutes =0;
 							getMinute++;
 						}
