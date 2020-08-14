@@ -10,17 +10,24 @@ typedef char int8_t;
 
 struct _KEY_STRUCT_
 {
-    uint8_t TimeSetUp;
-    uint8_t TimeSetDown;
-    uint8_t PowerSet : 1;
-    uint8_t RunSet:1;
-    uint8_t Set;
+    
+    uint8_t SetupOn :1;   //??????? -?????  ??? ???????????????
+    uint8_t TimerOn : 1 ;    //????? --???
+    uint8_t KillOn : 1;      //???? ---???
+    uint8_t PowerOn : 1;     //????----???
+    uint8_t RunOn: 1;       //????----???
+    
+    uint8_t TimeBaseUint;    //
     uint8_t TimeHour ;
     uint8_t TimeMinute;
     uint8_t TimeDecadeHour;
+    uint8_t windLevel;
+    uint8_t TimeSetUp;
+    uint8_t TimeSetDown;
 };
 
 struct  _KEY_STRUCT_   keystr;
+enum wind{minWind,smallWind,middleWind,moreWind,largerWind,maxWind};
 
 
 
@@ -28,7 +35,8 @@ struct  _KEY_STRUCT_   keystr;
 
 
 
-#define	LED_KEY1	RB0             //KEY_TIMER 0x800
+
+#define	LED_KEY1	RB0             //KEY_TIMER 0x800  
 #define	LED_KEY2	RB1             //KEY _UP   // 0x80
 #define	LED_KEY3	RB2             //KEY_DOWN //0x08
 #define	LED_KEY4	RB3             //KEY_RUN  //0X400;

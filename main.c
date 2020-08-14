@@ -263,7 +263,8 @@ void KeyServer()
 ***********************************************************/
 void main()
 {
-	uint8_t powerSt =0,timeupSt=0,runSt=0,timerSt=0,number=0;
+	uint8_t powerSt =0,timeupSt=0,runSt=0,timerSt=0,timedownSt=0;
+	uint8_t killSt = 0,setupSt = 0;
 	Init_System();
 	 IIC_Init_TM1650();
 	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
@@ -290,17 +291,30 @@ Next:		Init_System();
 			KeyServer();
 			if(keyflag_DOWN ==1){//KEY_DOWN //0x08
 				keyflag_DOWN=0;
+				timedownSt = timedownSt ^ 0x01;
+				if(timedownSt ==1){
 			     BKLT_L =1;
 				 if(gEvent == 1 ){
 					 gEvent =0;
 				 }
+				}
+				else{
+					BKLT_L =0;	
+					
+				}
 				 
 				
 			}
 			if(keyflag_KILL ==1){  //KEY_KILL ??
 				keyflag_KILL=0;
-				BKLT_R =1;
-				
+				killSt =killSt ^ 0x01;
+				if(killSt ==1){
+				 	BKLT_R =1;
+					
+				}
+				else{
+					BKLT_R =0;
+				}
 			}
 			if(keyflag_POWER ==1){  //KE_POWER  
 				keyflag_POWER=0;
@@ -322,8 +336,15 @@ Next:		Init_System();
 			}
 			if(keyflag_SETUP ==1){// KEY_SETUP ??
 				keyflag_SETUP=0;
-				BKLT_R=1;
-				
+				setupSt  = setupSt ^ 0x01;
+				if(setupSt == 1){
+				 BKLT_R=1;
+				 keystr.SetupOn =1;
+				}
+				else{
+					 BKLT_R=0;
+					 keystr.SetupOn = 0;
+				}
 			
 				
 			}
@@ -333,60 +354,77 @@ Next:		Init_System();
 				 if(timeupSt ==1){
 			        BKLT_L =1;//BKLT_L=0;
 					 gEvent =0;
-				
-					keystr.TimeSetUp ++ ;
-					if(keystr.TimeSetUp == 10){
-						 keystr.TimeSetUp =0;
-						 keystr.TimeMinute++;
-						 if(keystr.TimeMinute==10){
-							 keystr.TimeMinute =0;
-							 keystr.TimeDecadeHour ++;
-							 if(keystr.TimeDecadeHour ==10){
-								 keystr.TimeDecadeHour =0;
-								 keystr.TimeHour ++;
-								 if(keystr.TimeHour == 2){
-									if(keystr.TimeDecadeHour ==4){
-									   keystr.TimeHour =0;
-									   keystr.TimeDecadeHour =0;
-									   keystr.TimeMinute =0;
-									   keystr.TimeSetUp=0;
+				    if(keystr.SetupOn ==1){
+						keystr.TimeSetUp ++ ;
+						if(keystr.TimeSetUp == 10){
+							keystr.TimeSetUp =0;
+							keystr.TimeMinute++;
+							if(keystr.TimeMinute==10){
+								keystr.TimeMinute =0;
+								keystr.TimeDecadeHour ++;
+								if(keystr.TimeDecadeHour ==10){
+									keystr.TimeDecadeHour =0;
+									keystr.TimeHour ++;
+									if(keystr.TimeHour == 2){
+										if(keystr.TimeDecadeHour ==4){
+										keystr.TimeHour =0;
+										keystr.TimeDecadeHour =0;
+										keystr.TimeMinute =0;
+										keystr.TimeSetUp=0;
+										}
 									}
-								 }
-							 }
-						 }	
+								}
+							}	
+							
+							
+						}
+					}
+					else{
+					
+					    keystr.windLevel ++ ;
+					   if(keystr.windLevel ==5){
+						   keystr.windLevel =0;
+					   }
 						
 						
 					}
-				
 				}
 				 else{
 				  BKLT_L =0;
 				  gEvent =0;
-				  keystr.TimeSetUp ++ ;
-					if(keystr.TimeSetUp == 10){
-						 keystr.TimeSetUp =0;
-						 keystr.TimeMinute++;
-						 if(keystr.TimeMinute==10){
-							 keystr.TimeMinute =0;
-							 keystr.TimeDecadeHour ++;
-							 if(keystr.TimeDecadeHour ==10){
-								 keystr.TimeDecadeHour =0;
-								 keystr.TimeHour ++;
-								 if(keystr.TimeHour == 2){
-									if(keystr.TimeDecadeHour ==4){
-									   keystr.TimeHour =0;
-									   keystr.TimeDecadeHour =0;
-									   keystr.TimeMinute =0;
-									   keystr.TimeSetUp=0;
+				  if(keystr.SetupOn ==1){
+						  keystr.TimeSetUp ++ ;
+							if(keystr.TimeSetUp == 10){
+								keystr.TimeSetUp =0;
+								keystr.TimeMinute++;
+								if(keystr.TimeMinute==10){
+									keystr.TimeMinute =0;
+									keystr.TimeDecadeHour ++;
+									if(keystr.TimeDecadeHour ==10){
+										keystr.TimeDecadeHour =0;
+										keystr.TimeHour ++;
+										if(keystr.TimeHour == 2){
+											if(keystr.TimeDecadeHour ==4){
+											keystr.TimeHour =0;
+											keystr.TimeDecadeHour =0;
+											keystr.TimeMinute =0;
+											keystr.TimeSetUp=0;
+											}
+										}
 									}
-								 }
-							 }
-						 }	
-						
+								}	
+								
+								
+							}
 						
 					}
-				 
-				 
+				    else{
+						keystr.windLevel ++ ;
+					   if(keystr.windLevel ==5){
+						   keystr.windLevel =0;
+					   }
+						
+					}
 				 
 				 } 
 				
@@ -394,16 +432,16 @@ Next:		Init_System();
 			if(keyflag_RUN ==1){//KEY_RUN  //0X400;  OK
 				keyflag_RUN=0;
 				runSt = runSt ^ 0x01;
-				#if 0
+			
 				if(runSt ==1){
 			        BKLT_L =1;// BKLT_POINT=1;
-					keyPtstr->RunSet = 1;
+					
 				}
 				else{
 					BKLT_L = 0;
-					keyPtstr->RunSet = 0;
+					
 				}
-			   #endif 
+			  
 			
 			}
 			if(keyflag_TIMER ==1){//KEY_TIMER 0x800
