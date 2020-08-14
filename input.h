@@ -21,7 +21,7 @@ struct _KEY_STRUCT_
     uint8_t TimeHour ;
     uint8_t TimeMinute;
     uint8_t TimeDecadeHour;
-    uint8_t windLevel;
+    int8_t windLevel;
     uint8_t TimeSetUp;
     uint8_t TimeSetDown;
 };

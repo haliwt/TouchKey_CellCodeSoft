@@ -47,7 +47,7 @@ typedef enum _TASK_LIST
 
 
 
-void TaskLEDDisplay(uint8_t m,uint8_t de, uint8_t hundred, uint8_t thousand);
+void TaskLEDDisplay(void);
 void TaskKeySan(void);
 void TaskReceiveIR(void);
 void TaskTelecStatus(void);
@@ -293,7 +293,7 @@ Next:		Init_System();
 			KeyServer();
 			TaskKeySan();
 			
-			TaskLEDDisplay(keystr.TimeSetUp,keystr.TimeMinute,keystr.TimeDecadeHour,keystr.TimeHour);
+			TaskLEDDisplay();
 		}
 		
 			
@@ -331,24 +331,24 @@ void TaskProcess(void)
 	*Output Ref:No
 	*
 ***********************************************************/
-void TaskLEDDisplay(uint8_t m,uint8_t de, uint8_t hundred, uint8_t thousand)
+void TaskLEDDisplay(void)
 {
    
     // Init_Tm1650();
 	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
 	if(keystr.SetupOn ==1)
-	  TM1650_Set(0x68,segNumber[m]);//初始化为5级灰度，开显示
+	  TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);//初始化为5级灰度，开显示
     else{
 		TM1650_Set(0x68,segNumber[keystr.windLevel]);//显示风速，级别 
 	}
 
-	TM1650_Set(0x6A,segNumber[de]);//初始化为5级灰度，开显示
+	TM1650_Set(0x6A,segNumber[keystr.TimeMinute]);//初始化为5级灰度，开显示
 
 
-  TM1650_Set(0x6C,segNumber[hundred]);//初始化为5级灰度，开显示
+  TM1650_Set(0x6C,segNumber[keystr.TimeDecadeHour]);//初始化为5级灰度，开显示
 
 	
-   TM1650_Set(0x6E,segNumber[thousand]);//初始化为5级灰度，开显示
+   TM1650_Set(0x6E,segNumber[keystr.TimeHour]);//初始化为5级灰度，开显示
    
 }
 /***********************************************************
@@ -363,21 +363,49 @@ void TaskKeySan(void)
 {
 	static uint8_t powerSt =0,timeupSt=0,runSt=0,timerSt=0,timedownSt=0;
 	static uint8_t killSt = 0,setupSt = 0;
+	
 	if(keyflag_DOWN ==1){//KEY_DOWN //0x08
 				keyflag_DOWN=0;
 				timedownSt = timedownSt ^ 0x01;
-				if(timedownSt ==1){
-			     BKLT_L =1;
-				 if(gEvent == 1 ){
-					 gEvent =0;
-				 }
-				}
-				else{
-					BKLT_L =0;	
+				if(timedownSt ==1 && gEvent ==1){
+					BKLT_L =1;
 					
 				}
-				 
-				
+				else if(gEvent ==1){
+					BKLT_L =0;
+					
+				}
+				if(keystr.SetupOn ==1 && gEvent ==1){
+					   gEvent =0;
+						keystr.TimeBaseUint   = keystr.TimeSetDown -- ;
+						if(keystr.TimeBaseUint  ==0 || keystr.TimeBaseUint  <0){
+							keystr.TimeSetDown =0;
+							keystr.TimeBaseUint=0;
+							keystr.TimeMinute--;
+							if(keystr.TimeMinute <=0){
+								keystr.TimeMinute =0;
+								keystr.TimeDecadeHour --;
+								if(keystr.TimeDecadeHour <=0){
+									keystr.TimeDecadeHour =0;
+									keystr.TimeHour --;
+									if(keystr.TimeHour <=0)
+										keystr.TimeHour =0;
+									
+								}
+							}	
+							
+							
+						}
+					}
+					else if(gEvent ==1){
+						gEvent =0;
+						if(keystr.TimeBaseUint >0)
+						   keystr.TimeBaseUint = keystr.windLevel -- ;
+						else {
+						 keystr.TimeBaseUint=minWind;
+						 keystr.windLevel =minWind;
+					   }
+					}
 			}
 			if(keyflag_KILL ==1){  //KEY_KILL ??
 				keyflag_KILL=0;
@@ -420,89 +448,56 @@ void TaskKeySan(void)
 					 keystr.SetupOn = 0;
 				}
 			
-				
-			}
+			}	
 			if(keyflag_UP ==1){//KEY _UP   // 0x100
 				keyflag_UP=0;
 				 timeupSt = timeupSt ^ 0x01;
-				 if(timeupSt ==1){
+				 if(timeupSt ==1 && gEvent ==1){
 			        BKLT_L =1;//BKLT_L=0;
-					 gEvent =0;
-				    if(keystr.SetupOn ==1){
-						keystr.TimeSetUp ++ ;
-						if(keystr.TimeSetUp == 10){
-							keystr.TimeSetUp =0;
-							keystr.TimeMinute++;
-							if(keystr.TimeMinute==10){
-								keystr.TimeMinute =0;
-								keystr.TimeDecadeHour ++;
-								if(keystr.TimeDecadeHour ==10){
+				  }
+				 else if(gEvent ==1){
+					  BKLT_L=0;
+					 
+				}
+					
+					 
+				if(keystr.SetupOn ==1 && gEvent ==1){
+					gEvent =0;
+					keystr.TimeBaseUint = keystr.TimeSetUp ++ ;
+					if(keystr.TimeBaseUint  == 10){
+						keystr.TimeSetUp =0;
+						keystr.TimeBaseUint=0;
+						keystr.TimeMinute++;
+						if(keystr.TimeMinute==10){
+							keystr.TimeMinute =0;
+							keystr.TimeDecadeHour ++;
+							if(keystr.TimeDecadeHour ==10){
+								keystr.TimeDecadeHour =0;
+								keystr.TimeHour ++;
+								if(keystr.TimeHour == 2){
+									if(keystr.TimeDecadeHour ==4){
+									keystr.TimeHour =0;
 									keystr.TimeDecadeHour =0;
-									keystr.TimeHour ++;
-									if(keystr.TimeHour == 2){
-										if(keystr.TimeDecadeHour ==4){
-										keystr.TimeHour =0;
-										keystr.TimeDecadeHour =0;
-										keystr.TimeMinute =0;
-										keystr.TimeSetUp=0;
-										}
+									keystr.TimeMinute =0;
+									keystr.TimeSetUp=0;
 									}
 								}
-							}	
-							
-							
-						}
-					}
-					else{
-					
-					    keystr.windLevel ++ ;
-					   if(keystr.windLevel ==6){
-						   keystr.windLevel =0;
-					   }
+							}
+						}	
 						
 						
 					}
 				}
-				 else{
-				  BKLT_L =0;
-				  gEvent =0;
-				  if(keystr.SetupOn ==1){
-						  keystr.TimeSetUp ++ ;
-							if(keystr.TimeSetUp == 10){
-								keystr.TimeSetUp =0;
-								keystr.TimeMinute++;
-								if(keystr.TimeMinute==10){
-									keystr.TimeMinute =0;
-									keystr.TimeDecadeHour ++;
-									if(keystr.TimeDecadeHour ==10){
-										keystr.TimeDecadeHour =0;
-										keystr.TimeHour ++;
-										if(keystr.TimeHour == 2){
-											if(keystr.TimeDecadeHour ==4){
-											keystr.TimeHour =0;
-											keystr.TimeDecadeHour =0;
-											keystr.TimeMinute =0;
-											keystr.TimeSetUp=0;
-											}
-										}
-									}
-								}	
-								
-								
-							}
-						
-					}
-				    else{
+				else if(gEvent ==1){
+					 	gEvent =0;
 						keystr.windLevel ++ ;
 					   if(keystr.windLevel ==6){
 						   keystr.windLevel =0;
 					   }
 						
-					}
+				}
 				 
-				 } 
-				
-			}
+		    } 
 			if(keyflag_RUN ==1){//KEY_RUN  //0X400;  OK
 				keyflag_RUN=0;
 				runSt = runSt ^ 0x01;
