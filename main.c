@@ -543,35 +543,36 @@ void TaskKeySan(void)
 ***********************************************************/
 void TaskLEDDisplay(void)
 {
-   
+     static uint8_t timealt =0;
     // Init_Tm1650();
 	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
 	
 	if(keystr.TimerOn ==1 && keystr.SetupOn != 1){
 		
-						runTimes = 0x05;
+						 timealt = timealt ^ 0x01;
+						 runTimes = 0x05;
 					        
-						if( TimerBaseTim < 0){
+						if( keystr.TimeBaseUint < 0){
 						     keystr.TimeMinute-- ;
-							 if(keystr.TimeMinute !=-1) TimerBaseTim =9;
+							 if(keystr.TimeMinute !=-1) keystr.TimeBaseUint =9;
 							 else if(keystr.TimeMinute <0){
 								 keystr.TimeDecadeHour--;
 								 if( keystr.TimeDecadeHour != -1){
-									 TimerBaseTim =9;
+									 keystr.TimeBaseUint =9;
 									  keystr.TimeMinute=9;
 								 }
 								 else if( keystr.TimeDecadeHour != -1){
 									   keystr.TimeHour--; //借位 千位		
 									   if(keystr.TimeHour !=-1){
 										   
-										TimerBaseTim =9;
+										keystr.TimeBaseUint=9;
 									     keystr.TimeMinute=9;  
 										 keystr.TimeDecadeHour=9;
 									   }
 									   else if(keystr.TimeHour < 0)
 									   {
 										   
-										 TimerBaseTim =0;
+										 keystr.TimeBaseUint =0;
 									     keystr.TimeMinute=0;  
 										 keystr.TimeDecadeHour=0;
 										 keystr.TimeHour=0;
@@ -582,15 +583,15 @@ void TaskLEDDisplay(void)
 							 }
 							 
 						}
+			   
 			
-			
-			BKLT_POINT =1; //打开时间小数点
+		
 			BKLT_R=1;
 			BKLT_L=1;
 			
 	}
-     if(keystr.TimerOn ==1) TM1650_Set(0x68,segNumber[TimerBaseTim]);//初始化为5级灰度，开显示
-	else 
+    // if(keystr.TimerOn ==1) TM1650_Set(0x68,segNumber[TimerBaseTim]);//初始化为5级灰度，开显示
+	//else 
      TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);//初始化为5级灰度，开显示
    
    TM1650_Set(0x6A,segNumber[keystr.TimeMinute]);//初始化为5级灰度，开显示
@@ -679,8 +680,10 @@ void interrupt Isr_Timer()
 						minutes ++;
 						if(minutes ==120){ //1 minute
 							minutes =0;
-							  
-							  TimerBaseTim -- ;
+							  if(keystr.TimerOn ==1){
+								 keystr.TimeBaseUint --; 
+							  }
+							 // TimerBaseTim -- ;
 							  BKLT_POINT=0; //时间小数点
 								
 						    }
