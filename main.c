@@ -350,10 +350,11 @@ void TaskKeySan(void)
 				}
 				if(keystr.SetupOn ==1 && gEvent ==1){
 					   gEvent =0;
-					 
+					    if(keystr.TimeBaseUint==0)keystr.TimeBaseUint=1;
 						keystr.TimeBaseUint --;
-						if(keystr.TimeBaseUint == 0 || keystr.TimeBaseUint <0){
-							 
+						
+						if(keystr.TimeBaseUint ==0){
+							   
 							if(keystr.TimeDecadeHour ==0 &&  keystr.TimeHour==0 &&  keystr.TimeMinute==0 )
 							{             keystr.TimeBaseUint=0;
 										   keystr.TimeMinute=0;
@@ -378,20 +379,32 @@ void TaskKeySan(void)
 										    keystr.TimeMinute=9;
 											keystr.TimeDecadeHour--;
 											if(keystr.TimeDecadeHour >=0)keystr.TimeMinute=9;
-											else if(keystr.TimeDecadeHour< 0){
-											     keystr.TimeHour--; 
-												if(keystr.TimeHour >=0)keystr.TimeDecadeHour=9; 
-												else if(keystr.TimeHour < 0 ){
-														keystr.TimeBaseUint=0;
-														keystr.TimeMinute=0;
-														keystr.TimeDecadeHour=0;
-														keystr.TimeHour=0;
-												}
 											
+											else if(keystr.TimeDecadeHour< 0){
+												if(keystr.TimeHour==0){
+													keystr.TimeBaseUint=0;
+													keystr.TimeMinute=0;
+													keystr.TimeDecadeHour=0;
+													keystr.TimeHour=0;
+													
+												}
+												else {
+													keystr.TimeDecadeHour=9; 
+													keystr.TimeHour--; 
+													
+												   if(keystr.TimeHour < 0 ){
+															keystr.TimeBaseUint=0;
+															keystr.TimeMinute=0;
+															keystr.TimeDecadeHour=0;
+															keystr.TimeHour=0;
+														}
+													else if(keystr.TimeHour >=0)keystr.TimeDecadeHour=9; 
+													
+											
+											    }
 											}
-									
 										
-									}
+									     }
 								}
 	                                
 					 
