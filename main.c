@@ -352,25 +352,26 @@ void TaskKeySan(void)
 					   gEvent =0;
 					 
 						keystr.TimeBaseUint --;
-						if(keystr.TimeBaseUint < 0){
-							
+						if(keystr.TimeBaseUint == 0){
+							 keystr.TimeBaseUint=9;
 						     keystr.TimeMinute-- ;
-							 if(keystr.TimeMinute !=-1) keystr.TimeBaseUint=9;
-							 else if(keystr.TimeMinute <0){
+							 if(keystr.TimeMinute > 0) keystr.TimeBaseUint=9;
+							 else if(keystr.TimeMinute ==0){
+								 keystr.TimeMinute=9;
 								 keystr.TimeDecadeHour--;
-								 if( keystr.TimeDecadeHour != -1){
-									 keystr.TimeBaseUint=9;
+								 
+								 if( keystr.TimeDecadeHour >0){
 									  keystr.TimeMinute=9;
 								 }
-								 else if( keystr.TimeDecadeHour != -1){
+								 else if( keystr.TimeDecadeHour ==0){
+									   keystr.TimeMinute=9;
 									   keystr.TimeHour--; //借位 千位		
-									   if(keystr.TimeHour !=-1){
+									   if(keystr.TimeHour >0){
 										   
-										 keystr.TimeBaseUint=9;
 									     keystr.TimeMinute=9;  
-										 keystr.TimeDecadeHour=9;
+										 
 									   }
-									   else if(keystr.TimeHour < 0)
+									   else if(keystr.TimeHour ==0)
 									   {
 										   
 										 keystr.TimeBaseUint=0;
@@ -553,7 +554,7 @@ void TaskLEDDisplay(void)
 						runTimes = 0x05;
 						 
 						 timealt++ ;
-						  if(timealt ==2000){
+						  if(timealt ==2000){ //10秒 发一次数据
 							  timealt  = 0;
 							  runTimes =0;
 						  }
@@ -596,9 +597,7 @@ void TaskLEDDisplay(void)
 			BKLT_L=1;
 			
 	}
-    // if(keystr.TimerOn ==1) TM1650_Set(0x68,segNumber[TimerBaseTim]);//初始化为5级灰度，开显示
-	//else 
-     TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);//初始化为5级灰度，开显示
+ 	TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);//初始化为5级灰度，开显示
    
    TM1650_Set(0x6A,segNumber[keystr.TimeMinute]);//初始化为5级灰度，开显示
 

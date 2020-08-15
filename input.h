@@ -18,11 +18,11 @@ struct _KEY_STRUCT_
     uint8_t RunOn: 1;       //????----???
     uint8_t windMask :1;
     
-    int8_t TimeBaseUint;    //
-    int8_t TimeHour ;
-    int8_t TimeMinute;
-    int8_t TimeDecadeHour;
-    int8_t windLevel;
+    uint8_t TimeBaseUint;    //
+    uint8_t TimeHour ;
+    uint8_t TimeMinute;
+    uint8_t TimeDecadeHour;
+    uint8_t windLevel;
     uint8_t TimeSetUp;
     uint8_t TimeSetDown;
     uint8_t SendData ;
