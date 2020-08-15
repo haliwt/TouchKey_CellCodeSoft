@@ -367,8 +367,8 @@ void TaskKeySan(void)
 								 keystr.TimeBaseUint=9;
 								
 							     keystr.TimeMinute-- ;
-								
-								if(keystr.TimeMinute < 0){ //借位 十进制
+								if(keystr.TimeMinute >=0 )keystr.TimeBaseUint=9;
+								else if(keystr.TimeMinute < 0){ //借位 十进制
 									if(keystr.TimeDecadeHour ==0 &&  keystr.TimeHour==0 ) //没有数值 
 									{    
 											keystr.TimeBaseUint=0;
@@ -380,20 +380,23 @@ void TaskKeySan(void)
 									else { //借位 
 									    keystr.TimeMinute=9;
 										keystr.TimeDecadeHour--;
+										if(keystr.TimeDecadeHour >= 0)  keystr.TimeMinute=9;
 										
-										if(keystr.TimeDecadeHour<0){
+										else if(keystr.TimeDecadeHour<0){
 											  if(keystr.TimeHour==0){
 												  keystr.TimeBaseUint=0;
 													keystr.TimeMinute=0;
 													keystr.TimeDecadeHour=0;
 													keystr.TimeHour=0;
 												  
-											  }
-											  else{
-												  
+											    }
+										
+										        else{
+												    
 											        keystr.TimeDecadeHour=9; 
 													keystr.TimeHour--; 
-													if(keystr.TimeHour<0){
+													if(keystr.TimeHour>=0) keystr.TimeDecadeHour=9; 
+													else if(keystr.TimeHour<0 ){
 														
 														keystr.TimeBaseUint=0;
 														keystr.TimeMinute=0;
@@ -401,6 +404,7 @@ void TaskKeySan(void)
 														keystr.TimeHour=0;
 														
 													}
+												
 												  
 										   }		  
 												  
