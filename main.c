@@ -61,7 +61,7 @@ static struct _TASK_COMPONENTS TaskComps[] =
     {0, 40000, 40000, TaskTelecStatus}       // 同主板通讯 852ms = 125us *4000  =2分36秒执行一次 
 };
 
-
+volatile uint8_t TimerBaseTim;
 volatile unsigned char MainTime;
 volatile bit	B_MainLoop;
 /**********************************************************
@@ -335,7 +335,7 @@ void TaskProcess(void)
 void TaskKeySan(void)
 {
 	static uint8_t powerSt =0,timeupSt=0,runSt=0,timerSt=0,timedownSt=0;
-	static uint8_t killSt = 0,setupSt = 0;
+	static uint8_t killSt = 0,setupSt = 0,tempuint=1;
 	
 	if(keyflag_DOWN ==1){//KEY_DOWN //0x08
 				keyflag_DOWN=0;
@@ -350,35 +350,44 @@ void TaskKeySan(void)
 				}
 				if(keystr.SetupOn ==1 && gEvent ==1){
 					   gEvent =0;
-						keystr.TimeBaseUint   -- ;
-						if(keystr.TimeBaseUint  ==0 || keystr.TimeBaseUint  <0){
-							if(keystr.TimeMinute >=1){
-								keystr.TimeBaseUint =9;
-								keystr.TimeMinute--;
-							}
-							else keystr.TimeBaseUint=0;
+					 
+						keystr.TimeBaseUint --;
+						if(keystr.TimeBaseUint < 0){
 							
-							if(keystr.TimeMinute <=0){
-								if(keystr.TimeDecadeHour>=1){
-									keystr.TimeDecadeHour --;
-									keystr.TimeMinute=9;
-								}
-								else keystr.TimeMinute =0;
-								
-								if(keystr.TimeDecadeHour <=0){
-								if(keystr.TimeHour>=1){
-									keystr.TimeHour --;
-									keystr.TimeDecadeHour=9;
-								}
-								else keystr.TimeDecadeHour =0;
-									
-									if(keystr.TimeHour <=0)
-										keystr.TimeHour =0;
-									
-								}
-							}	
+						     keystr.TimeMinute-- ;
+							 if(keystr.TimeMinute !=-1) keystr.TimeBaseUint=9;
+							 else if(keystr.TimeMinute <0){
+								 keystr.TimeDecadeHour--;
+								 if( keystr.TimeDecadeHour != -1){
+									 keystr.TimeBaseUint=9;
+									  keystr.TimeMinute=9;
+								 }
+								 else if( keystr.TimeDecadeHour != -1){
+									   keystr.TimeHour--; //借位 千位		
+									   if(keystr.TimeHour !=-1){
+										   
+										 keystr.TimeBaseUint=9;
+									     keystr.TimeMinute=9;  
+										 keystr.TimeDecadeHour=9;
+									   }
+									   else if(keystr.TimeHour < 0)
+									   {
+										   
+										 keystr.TimeBaseUint=0;
+									     keystr.TimeMinute=0;  
+										 keystr.TimeDecadeHour=0;
+										 keystr.TimeHour=0;
+									   }
+									 
+								 }
+								 
+							 }
+							 
 						}
+							
+							 
 					}
+					
 					else if(gEvent ==1){ //风速递减
 						gEvent =0;
 						keystr.windMask = 1;
@@ -395,7 +404,7 @@ void TaskKeySan(void)
 				if(killSt ==1){
 				 	BKLT_R =1;
 					keystr.KillOn =1;
-					
+					keystr.windMask = 0;
 				}
 				else{
 					BKLT_R =0;
@@ -410,6 +419,7 @@ void TaskKeySan(void)
 				    BKLT_R =1;
 				    BKLT_L =1;
 				    keystr.PowerOn =1;
+					keystr.windMask = 0;
 			    }
 			    else{
 			    	BKLT_R =0;
@@ -420,21 +430,7 @@ void TaskKeySan(void)
 				
 				
 			}
-			if(keyflag_SETUP ==1){// KEY_SETUP ??
-				keyflag_SETUP=0;
-				setupSt  = setupSt ^ 0x01;
-				if(setupSt == 1){
-				 BKLT_R=1;
-				 keystr.SetupOn =1;
-				 BKLT_TIM=1; //turn off
-				 keystr.windMask = 0;
-				}
-				else{
-					 BKLT_R=0;
-					 keystr.SetupOn = 0;
-				}
 			
-			}	
 			if(keyflag_UP ==1){//KEY _UP   // 0x100
 				keyflag_UP=0;
 				 timeupSt = timeupSt ^ 0x01;
@@ -491,7 +487,7 @@ void TaskKeySan(void)
 				if(runSt ==1){
 			        BKLT_L =1;// BKLT_POINT=1;
 					keystr.RunOn =1;
-					getMinute=0;
+					keystr.windMask = 0;
 				}
 				else{
 					BKLT_L = 0;
@@ -500,6 +496,23 @@ void TaskKeySan(void)
 			  
 			
 			}
+			if(keyflag_SETUP ==1){// KEY_SETUP ??
+				keyflag_SETUP=0;
+				setupSt  = setupSt ^ 0x01;
+				if(setupSt == 1){
+				 BKLT_R=1;
+				 keystr.SetupOn =1;
+				 BKLT_TIM=1; //turn off
+				 keystr.windMask = 0;
+				 keystr.TimerOn =0;
+				 TimerBaseTim=0;
+				}
+				else{
+					 BKLT_R=0;
+					 keystr.SetupOn = 0;
+				}
+			
+			}	
 			if(keyflag_TIMER ==1){//KEY_TIMER 0x800
 				keyflag_TIMER=0;
 				timerSt = timerSt ^ 0x01;
@@ -507,6 +520,7 @@ void TaskKeySan(void)
 				   BKLT_TIM=0;
 				   keystr.TimerOn =1;
 				   keystr.windMask = 0;
+				   TimerBaseTim =0;
 				}
 				else 
 					BKLT_TIM=1; //turn off
@@ -529,42 +543,51 @@ void TaskLEDDisplay(void)
     // Init_Tm1650();
 	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
 	
-	if(keystr.TimerOn ==1){
+	if(keystr.TimerOn ==1 && keystr.SetupOn != 1){
 		
-							runTimes = 0x05;
-		  	               if(keystr.TimerTim==1){
-							if(keystr.TimeMinute >=1){
-								keystr.TimeBaseUint =9;
-								keystr.TimeMinute--;
-								keystr.TimerTim=0;
-							}
-							else keystr.TimeBaseUint=0;
+						runTimes = 0x05;
+		  	          // keystr.TimeBaseUint --;
+						if(keystr.TimeBaseUint < 0){
 							
-							if(keystr.TimeMinute <=0){
-								if(keystr.TimeDecadeHour>=1){
-									keystr.TimeDecadeHour --;
-									keystr.TimeMinute=9;
-								}
-								else keystr.TimeMinute =0;
-								
-								if(keystr.TimeDecadeHour <=0){
-								if(keystr.TimeHour>=1){
-									keystr.TimeHour --;
-									keystr.TimeDecadeHour=9;
-								}
-								else keystr.TimeDecadeHour =0;
-									
-									if(keystr.TimeHour <=0)
-										keystr.TimeHour =0;
-									
-								}
-							}	
-			}
+						     keystr.TimeMinute-- ;
+							 if(keystr.TimeMinute !=-1) keystr.TimeBaseUint=9;
+							 else if(keystr.TimeMinute <0){
+								 keystr.TimeDecadeHour--;
+								 if( keystr.TimeDecadeHour != -1){
+									 keystr.TimeBaseUint=9;
+									  keystr.TimeMinute=9;
+								 }
+								 else if( keystr.TimeDecadeHour != -1){
+									   keystr.TimeHour--; //借位 千位		
+									   if(keystr.TimeHour !=-1){
+										   
+										 keystr.TimeBaseUint=9;
+									     keystr.TimeMinute=9;  
+										 keystr.TimeDecadeHour=9;
+									   }
+									   else if(keystr.TimeHour < 0)
+									   {
+										   
+										 keystr.TimeBaseUint=0;
+									     keystr.TimeMinute=0;  
+										 keystr.TimeDecadeHour=0;
+										 keystr.TimeHour=0;
+									   }
+									 
+								 }
+								 
+							 }
+							 
+						}
+			
 			TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);
-		
+			BKLT_POINT =1; //打开时间小数点
+			BKLT_R=1;
+			BKLT_L=1;
+			
 	}
 	else 
-  		TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);//初始化为5级灰度，开显示
+  	TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);//初始化为5级灰度，开显示
    
    TM1650_Set(0x6A,segNumber[keystr.TimeMinute]);//初始化为5级灰度，开显示
 
@@ -652,16 +675,13 @@ void interrupt Isr_Timer()
 						minutes ++;
 						if(minutes ==120){ //1 minute
 							minutes =0;
-							if(keystr.TimerOn==1){
-							     keystr.TimeBaseUint --;
-								 if(keystr.TimeBaseUint ==0){
-									 keystr.TimerTim =1;
-									 keystr.TimeBaseUint=9;
-							}
-						}
+							  keystr.TimeBaseUint --; // TimerBaseTim ++ ;
+								 BKLT_POINT=1; //时间小数点
+								
+						    }
 
-			  }
-			}
+			            }
+		
 			  #if 1
 				//Telec->get_8_microsecond++;
 				ptpwm_flag=ptpwm_flag^0x1;
@@ -689,7 +709,7 @@ void interrupt Isr_Timer()
 				#endif 
 					
 		}
-	}
+	
 	else
 	{
 		PIR1 = 0;
@@ -697,7 +717,9 @@ void interrupt Isr_Timer()
 
 	}
 	
+	}
+}
+	
 }
 
-}	
 
