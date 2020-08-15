@@ -354,7 +354,7 @@ void TaskKeySan(void)
 				
 						keystr.TimeBaseUint --;
 						
-						if(keystr.TimeBaseUint ==0){
+						if(keystr.TimeBaseUint ==0|| keystr.TimeBaseUint< 0){
 							   
 							if(keystr.TimeDecadeHour ==0 &&  keystr.TimeHour==0 &&  keystr.TimeMinute==0 )
 							{             keystr.TimeBaseUint=0;
@@ -368,18 +368,19 @@ void TaskKeySan(void)
 								
 							     keystr.TimeMinute-- ;
 								
-								if(keystr.TimeMinute < 0){
-									if(keystr.TimeDecadeHour ==0 &&  keystr.TimeHour==0 )
+								if(keystr.TimeMinute < 0){ //借位 十进制
+									if(keystr.TimeDecadeHour ==0 &&  keystr.TimeHour==0 ) //没有数值 
 									{    
 											keystr.TimeBaseUint=0;
 											keystr.TimeMinute=0;
 											keystr.TimeDecadeHour=0;
 											keystr.TimeHour=0;
+											
 									}
-									else {
-									
+									else { //借位 
+									    keystr.TimeMinute=9;
 										keystr.TimeDecadeHour--;
-										keystr.TimeMinute=9;
+										
 										if(keystr.TimeDecadeHour<0){
 											  if(keystr.TimeHour==0){
 												  keystr.TimeBaseUint=0;
@@ -388,8 +389,7 @@ void TaskKeySan(void)
 													keystr.TimeHour=0;
 												  
 											  }
-										}
-										else{
+											  else{
 												  
 											        keystr.TimeDecadeHour=9; 
 													keystr.TimeHour--; 
@@ -402,9 +402,9 @@ void TaskKeySan(void)
 														
 													}
 												  
+										   }		  
 												  
-												  
-										 }
+										}
 											
 										
 										
@@ -428,6 +428,7 @@ void TaskKeySan(void)
 				}
 			   
 	}
+	
 	if(keyflag_KILL ==1){  //KEY_KILL ??
 				keyflag_KILL=0;
 				killSt =killSt ^ 0x01;
