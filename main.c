@@ -277,7 +277,7 @@ void main()
 		
         if(runTimes==0){
 			 runTimes++;
-			 Init28_System();
+	         Init28_System();
 			 WriteByte(keystr.SendData) ;
 			goto Next;
 		 }
@@ -523,6 +523,7 @@ void TaskKeySan(void)
 				   keystr.windMask = 0;
 				   getMinute =0 ;
 				   TimerBaseTim = keystr.TimeBaseUint ;
+				   keystr.SetupOn =0;
 				}
 				else if(gEvent ==1){
 					 gEvent =0;
@@ -543,14 +544,19 @@ void TaskKeySan(void)
 ***********************************************************/
 void TaskLEDDisplay(void)
 {
-     static uint8_t timealt =0;
+     static uint16_t timealt =0;
     // Init_Tm1650();
 	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
 	
 	if(keystr.TimerOn ==1 && keystr.SetupOn != 1){
 		
-						 timealt = timealt ^ 0x01;
-						 runTimes = 0x05;
+						runTimes = 0x05;
+						 
+						 timealt++ ;
+						  if(timealt ==2000){
+							  timealt  = 0;
+							  runTimes =0;
+						  }
 					        
 						if( keystr.TimeBaseUint < 0){
 						     keystr.TimeMinute-- ;
