@@ -364,62 +364,58 @@ void TaskKeySan(void)
 							}
 						    else{
 								 keystr.TimeBaseUint=9;//借一当十
-								 
+							//	 if(keystr.TimeMinute==0)keystr.TimeMinute=1;
 								
-								 keystr.TimeMinute-- ; //借位
+								 keystr.TimeMinute-- ; //借位 十位
 								 
-								if(keystr.TimeMinute >=0 ){
-									keystr.TimeBaseUint=9;
-								}
-								else{ //小于零  ，向百位借位				   
+								if(keystr.TimeMinute ==0 ){
+									
+										keystr.TimeBaseUint=9;//借一当十
+									}
+									else{ //小于零  ，向百位借位				   
 															   
-									if(keystr.TimeDecadeHour ==0 &&  keystr.TimeHour==0 ) //没有数值 
-									{    
-											if(keystr.TimeMinute < 0) keystr.TimeMinute=0;
-											keystr.TimeBaseUint=0;
-											keystr.TimeMinute=0;
-											keystr.TimeDecadeHour=0;
-											keystr.TimeHour=0;
-											
-									}
-									else if(keystr.TimeDecadeHour >0){
-										    	keystr.TimeDecadeHour--;  //百位借位 
-										         keystr.TimeMinute=9;
+										keystr.TimeMinute-=9 ;
+									//	if(keystr.TimeDecadeHour==0)keystr.TimeDecadeHour=1;
+										keystr.TimeDecadeHour--;  //百位借位 
 										
-									}
-									else if(keystr.TimeDecadeHour ==0 ) //百位没有数,向千位借位 
-									{
-									    
-										  keystr.TimeHour--;
-										  
-										if(keystr.TimeHour >=0){
+										if(keystr.TimeDecadeHour ==0 ) //没有数值 
+										{    
+											 keystr.TimeMinute=9;
+									    }
+										else {//向千位，借位
 											
 											keystr.TimeMinute=9;
-											keystr.TimeDecadeHour=9;
+										//	if(keystr.TimeDecadeHour==0)keystr.TimeDecadeHour=1;
+											keystr.TimeHour--;  //千位
+														
+											if(keystr.TimeHour ==0){
+														
+												keystr.TimeBaseUint=0;
+												keystr.TimeMinute=0;
+													keystr.TimeDecadeHour=0;
+													keystr.TimeHour=0;
+												
+											}
+											else {
+											
+												
+												     keystr.TimeMinute=9;
+													keystr.TimeDecadeHour=9;
+												
+											
+												
+												
+											}
 										}
-										else{
-											
-											 if(keystr.TimeHour< 0)keystr.TimeHour=0;
-											keystr.TimeBaseUint=0;
-											keystr.TimeMinute=0;
-											keystr.TimeDecadeHour=0;
-											keystr.TimeHour=0;
-											
-											
-										}
-										
-										
-									}
-								    
 									
-								
+									}
 								}
 								
 	                                
 					 
-				            }
-					    }
+				       }
 				}
+				
 				else if(gEvent ==1 && downflag !=0 && keystr.SetupOn ==0){ //风速递减
 						gEvent =0;
 						keystr.windMask = 1;
@@ -483,44 +479,38 @@ void TaskKeySan(void)
 					 
 				}
 					
-					 
-				if(keystr.SetupOn ==1 && gEvent ==1  && upflag == 0){
-					gEvent =0;
-					upflag =1;
-					keystr.TimeBaseUint ++ ;
-					if(keystr.TimeBaseUint == 10){
-						keystr.TimeBaseUint=0;
-						keystr.TimeMinute++;
-						if(keystr.TimeMinute==10){
-							keystr.TimeMinute =0;
-							keystr.TimeDecadeHour ++;
-							if(keystr.TimeDecadeHour ==10){
-								keystr.TimeDecadeHour =0;
-								keystr.TimeHour ++;
-								if(keystr.TimeHour == 10){
-									keystr.TimeHour =0;
+					if(keystr.SetupOn ==1 && gEvent ==1  && upflag == 0){
+						gEvent =0;
+					
+						keystr.TimeBaseUint ++ ;
+						if(keystr.TimeBaseUint == 10){
+							keystr.TimeBaseUint=0;
+							keystr.TimeMinute++;
+							if(keystr.TimeMinute==10){
+								keystr.TimeMinute =0;
+								keystr.TimeDecadeHour ++;
+								if(keystr.TimeDecadeHour ==10){
 									keystr.TimeDecadeHour =0;
-									keystr.TimeMinute =0;
-									keystr.TimeSetUp=0;
+									keystr.TimeHour ++;
+									if(keystr.TimeHour == 10){
+										keystr.TimeHour =2;
 									}
 								}
 							}
 						}	
-						
-						
+							
+							
 					}
-				}
-				else if(gEvent ==1 && upflag !=0 && keystr.SetupOn ==0){
+				
+				else if(gEvent ==1 && upflag ==1 && keystr.SetupOn ==0){
 					 	gEvent =0;
 						keystr.windMask = 1;
 						keystr.windLevel ++ ;
 					   if(keystr.windLevel >maxWind){
 						   keystr.windLevel = minWind;
 					   }
-						
-				}
-				 
-		    } 
+				}		
+			}
 			if(keyflag_RUN ==1){//KEY_RUN  //0X400;  OK
 				keyflag_RUN=0;
 				runSt = runSt ^ 0x01;
