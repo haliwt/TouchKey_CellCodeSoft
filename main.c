@@ -335,7 +335,7 @@ void TaskProcess(void)
 void TaskKeySan(void)
 {
 	static uint8_t powerSt =0,timeupSt=0,runSt=0,timerSt=0,timedownSt=0;
-	static uint8_t killSt = 0,setupSt = 0,tempuint=1,upflag=0;;
+	static uint8_t killSt = 0,setupSt = 0,tempuint=1,upflag=0,downflag =0;
 	
 	if(keyflag_DOWN ==1){//KEY_DOWN //0x08
 				keyflag_DOWN=0;
@@ -348,9 +348,8 @@ void TaskKeySan(void)
 					BKLT_L =0;
 					
 				}
-				if(keystr.SetupOn ==1 && gEvent ==1 && keystr.windMask == 0){
+				if(keystr.SetupOn ==1 && gEvent ==1 && downflag == 0){
 					   gEvent =0;
-					   upflag=1;
 						if(keystr.TimeBaseUint == 0)keystr.TimeBaseUint =1;
 						keystr.TimeBaseUint --;
 						
@@ -383,6 +382,11 @@ void TaskKeySan(void)
 											keystr.TimeHour=0;
 											
 									}
+									else if(keystr.TimeDecadeHour >0){
+										    	keystr.TimeDecadeHour--;  //百位借位 
+										         keystr.TimeMinute=9;
+										
+									}
 									else if(keystr.TimeDecadeHour ==0 ) //百位没有数,向千位借位 
 									{
 									    
@@ -394,6 +398,7 @@ void TaskKeySan(void)
 											keystr.TimeDecadeHour=9;
 										}
 										else{
+											
 											 if(keystr.TimeHour< 0)keystr.TimeHour=0;
 											keystr.TimeBaseUint=0;
 											keystr.TimeMinute=0;
@@ -405,33 +410,17 @@ void TaskKeySan(void)
 										
 										
 									}
-									else if(keystr.TimeHour ==0 ) 
-									{
-										
-										keystr.TimeDecadeHour--;  //百位借位 
-										if(keystr.TimeDecadeHour >=0){
-										    keystr.TimeMinute=9;
-											
-										}
-										else{
-											if(keystr.TimeDecadeHour<0)keystr.TimeDecadeHour=0;
-											keystr.TimeBaseUint=0;
-											keystr.TimeMinute=0;
-											keystr.TimeDecadeHour=0;
-											keystr.TimeHour=0;
-											
-										}
-										
-									}
+								    
+									
 								
 								}
 								
 	                                
 					 
 				            }
-						}
+					    }
 				}
-				else if(gEvent ==1 && upflag !=1 && keystr.SetupOn ==0){ //风速递减
+				else if(gEvent ==1 && downflag !=0 && keystr.SetupOn ==0){ //风速递减
 						gEvent =0;
 						keystr.windMask = 1;
 						if(keystr.windLevel >minWind && keystr.windLevel <=maxWind)
@@ -441,8 +430,8 @@ void TaskKeySan(void)
 					     }
 				}
 			   
+		
 	}
-	
 	if(keyflag_KILL ==1){  //KEY_KILL ??
 				keyflag_KILL=0;
 				killSt =killSt ^ 0x01;
@@ -495,7 +484,7 @@ void TaskKeySan(void)
 				}
 					
 					 
-				if(keystr.SetupOn ==1 && gEvent ==1  && keystr.windMask == 0){
+				if(keystr.SetupOn ==1 && gEvent ==1  && upflag == 0){
 					gEvent =0;
 					upflag =1;
 					keystr.TimeBaseUint ++ ;
@@ -508,8 +497,7 @@ void TaskKeySan(void)
 							if(keystr.TimeDecadeHour ==10){
 								keystr.TimeDecadeHour =0;
 								keystr.TimeHour ++;
-								if(keystr.TimeHour == 2){
-									if(keystr.TimeDecadeHour ==4){
+								if(keystr.TimeHour == 10){
 									keystr.TimeHour =0;
 									keystr.TimeDecadeHour =0;
 									keystr.TimeMinute =0;
@@ -522,7 +510,7 @@ void TaskKeySan(void)
 						
 					}
 				}
-				else if(gEvent ==1 && upflag !=1 && keystr.SetupOn ==0){
+				else if(gEvent ==1 && upflag !=0 && keystr.SetupOn ==0){
 					 	gEvent =0;
 						keystr.windMask = 1;
 						keystr.windLevel ++ ;
@@ -564,11 +552,14 @@ void TaskKeySan(void)
 				 keystr.TimerOn =0;
 				 TimerBaseTim=0;
 				 upflag=0;
+				 downflag =0;
 				}
 				else if(gEvent ==1){
 					gEvent =0;
 					 BKLT_R=0;
 					 keystr.SetupOn = 0;
+					 downflag = 1;
+					 upflag =1;
 				}
 			
 			}	
