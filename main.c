@@ -368,29 +368,14 @@ void TaskKeySan(void)
 								
 								 keystr.TimeMinute-- ; //借位 十位
 								 
-								if(keystr.TimeMinute >=0 ){
-									
-										keystr.TimeBaseUint=9;//借一当十
-								}
-								else { //小于零  ，向百位借位				   
-															   
-										if(keystr.TimeDecadeHour ==0 &&  keystr.TimeHour==0)
-										{              keystr.TimeBaseUint=0;
-													   keystr.TimeMinute=0;
-														keystr.TimeDecadeHour=0;
-														keystr.TimeHour=0;
-														
-										}
-								        else{
-											  keystr.TimeMinute=9 ;
-											 
-											  keystr.TimeDecadeHour--;  //百位借位 
+								
+								if( keystr.TimeMinute== 0 ){ //小于零  ，向百位借位				   
+											keystr.TimeMinute=9;				   
+										 
+											 keystr.TimeDecadeHour--;  //百位借位 
 											
-											if(keystr.TimeDecadeHour >=0 ) //没有数值 
-											{    
-												keystr.TimeMinute=9;
-											}
-											else{ //千位借位
+										
+											if( keystr.TimeDecadeHour==0){ //千位借位
 											    if(keystr.TimeHour ==0){ 
 													keystr.TimeBaseUint=0;
 													keystr.TimeMinute=0;
@@ -399,15 +384,10 @@ void TaskKeySan(void)
 													
 												}
 												else{
+														keystr.TimeDecadeHour=9;
 														keystr.TimeHour--;  //千位
-														if(keystr.TimeHour >=0){
-															
-															keystr.TimeBaseUint=9;//借一当十
-															keystr.TimeMinute=9 ;
-															keystr.TimeDecadeHour=9;
-															
-														}
-														else{
+														
+														if(keystr.TimeHour==0 ){
 															keystr.TimeBaseUint=0;
 															keystr.TimeMinute=0;
 															keystr.TimeDecadeHour=0;
@@ -428,12 +408,8 @@ void TaskKeySan(void)
 								
 							}
 								
-						}
-						if(keystr.TimeMinute <0)keystr.TimeMinute =0;
-						if(keystr.TimeDecadeHour <0)keystr.TimeDecadeHour =0;
-						if(keystr.TimeDecadeHour <0)keystr.TimeDecadeHour =0;
-						if(keystr.TimeHour < 0)keystr.TimeHour=0;				
-	             }
+				}
+					
 				
 				else if(gEvent ==1 && downflag !=0 && keystr.SetupOn ==0){ //风速递减
 						gEvent =0;
