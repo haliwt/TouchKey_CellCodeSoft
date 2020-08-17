@@ -61,7 +61,7 @@ static struct _TASK_COMPONENTS TaskComps[] =
     {0, 40000, 40000, TaskTelecStatus}       // 同主板通讯 852ms = 125us *4000  =2分36秒执行一次 
 };
 
-volatile uint8_t TimerBaseTim;
+static int8_t TimerBaseTim=0;
 volatile unsigned char MainTime;
 volatile bit	B_MainLoop;
 /**********************************************************
@@ -590,45 +590,70 @@ void TaskLEDDisplay(void)
 						runTimes = 0x05;
 						 
 						 timealt++ ;
-						  if(timealt ==2000){ //10秒 发一次数据
+						  if(timealt ==3000){ //10秒 发一次数据
 							  timealt  = 0;
 							  runTimes =0;
 						  }
-					        
-						if( keystr.TimeBaseUint < 0){
-						     keystr.TimeMinute-- ;
-							 if(keystr.TimeMinute !=-1) keystr.TimeBaseUint =9;
-							 else if(keystr.TimeMinute <0){
-								 keystr.TimeDecadeHour--;
-								 if( keystr.TimeDecadeHour != -1){
-									 keystr.TimeBaseUint =9;
-									  keystr.TimeMinute=9;
-								 }
-								 else if( keystr.TimeDecadeHour != -1){
-									   keystr.TimeHour--; //借位 千位		
-									   if(keystr.TimeHour !=-1){
-										   
-										keystr.TimeBaseUint=9;
-									     keystr.TimeMinute=9;  
-										 keystr.TimeDecadeHour=9;
-									   }
-									   else if(keystr.TimeHour < 0)
-									   {
-										   
-										 keystr.TimeBaseUint =0;
-									     keystr.TimeMinute=0;  
-										 keystr.TimeDecadeHour=0;
-										 keystr.TimeHour=0;
-									   }
-									 
-								 }
-								 
-							 }
-							 
-						}
+						if( keystr.TimeBaseUint== 0){
+							   
+							if(keystr.TimeDecadeHour ==0 &&  keystr.TimeHour==0 &&  keystr.TimeMinute==0 )
+							{             keystr.TimeBaseUint=0;
+										   keystr.TimeMinute=0;
+											keystr.TimeDecadeHour=0;
+											keystr.TimeHour=0;
+											
+							}
+						    else{
+								// keystr.TimeBaseUint=9;//借一当十
+							
+								 if( keystr.TimeMinute==0){
+										if(keystr.TimeDecadeHour ==0 &&  keystr.TimeHour==0 ) {
+											
+											   keystr.TimeBaseUint=0;
+												keystr.TimeMinute=0;
+												keystr.TimeDecadeHour=0;
+												keystr.TimeHour=0;
+								
+											
+										}
+										else{
+										    keystr.TimeBaseUint=9;
+											keystr.TimeMinute=9;//借一当十
+											
+											if(keystr.TimeDecadeHour ==0){
+												
+												if(keystr.TimeHour > 0){
+													keystr.TimeHour --		;				  
+													keystr.TimeDecadeHour=9;//借一当十
+													
+												}
+												else{
+													 keystr.TimeBaseUint=0;
+													keystr.TimeMinute=0;
+													keystr.TimeDecadeHour=0;
+													keystr.TimeHour=0;
+													
+												}
+											}
+											else if(keystr.TimeDecadeHour > 0){
+												
+												keystr.TimeDecadeHour --	;					  
+												keystr.TimeMinute=9;//借一当十
+												 keystr.TimeBaseUint=9;
+												
+											}
+													
+										}			
+								    }
+							        else if(keystr.TimeMinute > 0) { //借位 十位
+										keystr.TimeMinute --	;					  
+										keystr.TimeBaseUint=9;//借一当十
+						   }						  
+						} 
+					}	
 			   
 			
-		
+		 
 			BKLT_R=1;
 			BKLT_L=1;
 			
@@ -722,15 +747,14 @@ void interrupt Isr_Timer()
 						minutes ++;
 						if(minutes ==120){ //1 minute
 							minutes =0;
-							  if(keystr.TimerOn ==1){
-								 keystr.TimeBaseUint --; 
-							  }
-							 // TimerBaseTim -- ;
-							  BKLT_POINT=0; //时间小数点
-								
-						    }
+							if(keystr.TimerOn ==1){
+							  if(keystr.TimeBaseUint == 0) keystr.TimeBaseUint=1;
+							   keystr.TimeBaseUint --;
+							   
+							}
+						 }
 
-			            }
+			}
 		
 			  #if 1
 				//Telec->get_8_microsecond++;
