@@ -376,12 +376,15 @@ void TaskKeySan(void)
 											
 										}
 										else{
+											keystr.TimeBaseUint=9;
 											keystr.TimeMinute=9;//借一当十
+											
 											if(keystr.TimeDecadeHour ==0){
 												
 												if(keystr.TimeHour > 0){
 													keystr.TimeHour --		;				  
 													keystr.TimeDecadeHour=9;//借一当十
+													
 												}
 												else{
 													keystr.TimeBaseUint=0;
@@ -395,6 +398,7 @@ void TaskKeySan(void)
 												
 												keystr.TimeDecadeHour --	;					  
 												keystr.TimeMinute=9;//借一当十
+												keystr.TimeBaseUint=9;
 												
 											}
 													
