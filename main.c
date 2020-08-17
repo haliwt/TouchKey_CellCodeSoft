@@ -363,7 +363,7 @@ void TaskKeySan(void)
 											
 							}
 						    else{
-								 keystr.TimeBaseUint=9;//借一当十
+								// keystr.TimeBaseUint=9;//借一当十
 							
 								 if( keystr.TimeMinute==0){
 										if(keystr.TimeDecadeHour ==0 &&  keystr.TimeHour==0 ) {
@@ -377,9 +377,18 @@ void TaskKeySan(void)
 										}
 										else{
 											if(keystr.TimeDecadeHour ==0){
-												keystr.TimeHour --		;				  
-												keystr.TimeDecadeHour=9;//借一当十
 												
+												if( keystr.TimeHour > 0){
+													keystr.TimeHour --		;				  
+													keystr.TimeDecadeHour=9;//借一当十
+												}
+												else{
+													keystr.TimeBaseUint=0;
+													keystr.TimeMinute=0;
+													keystr.TimeDecadeHour=0;
+													keystr.TimeHour=0;
+													
+												}
 											}
 											else if(keystr.TimeDecadeHour > 0){
 												
@@ -390,25 +399,15 @@ void TaskKeySan(void)
 													
 										}			
 								    }
-							       }
-						       }
-								else if (keystr.TimeMinute > 0) { //借位 十位
+							
+						   			else if(keystr.TimeMinute > 0) { //借位 十位
 										keystr.TimeMinute --	;					  
 										keystr.TimeBaseUint=9;//借一当十
-													  
-								 } 
-							
-						}    
+						   }						  
+						} 
+					}	
+				}    
 										
-						
-					
-										
-							 
-								
-				
-	
-				   
-	            
 				else if(gEvent ==1 && downflag !=0 && keystr.SetupOn ==0){ //风速递减
 						gEvent =0;
 						keystr.windMask = 1;
