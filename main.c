@@ -590,7 +590,7 @@ void TaskLEDDisplay(void)
 						runTimes = 0x05;
 						 
 						 timealt++ ;
-						  if(timealt ==3000){ //10秒 发一次数据
+						  if(timealt ==2000){ //10秒 发一次数据
 							  timealt  = 0;
 							  runTimes =0;
 						  }
@@ -652,8 +652,11 @@ void TaskLEDDisplay(void)
 						} 
 					}	
 			   
-			
-		 
+			if(keystr.TimeMinute==0 && keystr.TimeBaseUint==0 && keystr.TimeDecadeHour==0 && keystr.TimeHour==0 ){
+				keystr.TimerOn == 0;
+				BKLT_R=0;
+				BKLT_L=0;
+			}
 			BKLT_R=1;
 			BKLT_L=1;
 			
