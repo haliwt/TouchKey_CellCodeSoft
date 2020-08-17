@@ -364,57 +364,76 @@ void TaskKeySan(void)
 							}
 						    else{
 								 keystr.TimeBaseUint=9;//借一当十
-							//	 if(keystr.TimeMinute==0)keystr.TimeMinute=1;
+							
 								
 								 keystr.TimeMinute-- ; //借位 十位
 								 
-								if(keystr.TimeMinute ==0 ){
+								if(keystr.TimeMinute >=0 ){
 									
 										keystr.TimeBaseUint=9;//借一当十
-									}
-									else{ //小于零  ，向百位借位				   
+								}
+								else { //小于零  ，向百位借位				   
 															   
-										keystr.TimeMinute-=9 ;
-									//	if(keystr.TimeDecadeHour==0)keystr.TimeDecadeHour=1;
-										keystr.TimeDecadeHour--;  //百位借位 
-										
-										if(keystr.TimeDecadeHour ==0 ) //没有数值 
-										{    
-											 keystr.TimeMinute=9;
-									    }
-										else {//向千位，借位
+										if(keystr.TimeDecadeHour ==0 &&  keystr.TimeHour==0)
+										{              keystr.TimeBaseUint=0;
+													   keystr.TimeMinute=0;
+														keystr.TimeDecadeHour=0;
+														keystr.TimeHour=0;
+														
+										}
+								        else{
+											  keystr.TimeMinute=9 ;
+											 
+											  keystr.TimeDecadeHour--;  //百位借位 
 											
-											keystr.TimeMinute=9;
-										//	if(keystr.TimeDecadeHour==0)keystr.TimeDecadeHour=1;
-											keystr.TimeHour--;  //千位
-														
-											if(keystr.TimeHour ==0){
-														
-												keystr.TimeBaseUint=0;
-												keystr.TimeMinute=0;
+											if(keystr.TimeDecadeHour >=0 ) //没有数值 
+											{    
+												keystr.TimeMinute=9;
+											}
+											else{ //千位借位
+											    if(keystr.TimeHour ==0){ 
+													keystr.TimeBaseUint=0;
+													keystr.TimeMinute=0;
 													keystr.TimeDecadeHour=0;
 													keystr.TimeHour=0;
+													
+												}
+												else{
+														keystr.TimeHour--;  //千位
+														if(keystr.TimeHour >=0){
+															
+															keystr.TimeBaseUint=9;//借一当十
+															keystr.TimeMinute=9 ;
+															keystr.TimeDecadeHour=9;
+															
+														}
+														else{
+															keystr.TimeBaseUint=0;
+															keystr.TimeMinute=0;
+															keystr.TimeDecadeHour=0;
+															keystr.TimeHour=0;
+															
+														}
+														
+														
+														
+													}
+												
 												
 											}
-											else {
-											
-												
-												     keystr.TimeMinute=9;
-													keystr.TimeDecadeHour=9;
-												
-											
-												
-												
-											}
+										
 										}
-									
-									}
-								}
+										
+								 }
 								
-	                                
-					 
-				       }
-				}
+							}
+								
+						}
+						if(keystr.TimeMinute <0)keystr.TimeMinute =0;
+						if(keystr.TimeDecadeHour <0)keystr.TimeDecadeHour =0;
+						if(keystr.TimeDecadeHour <0)keystr.TimeDecadeHour =0;
+						if(keystr.TimeHour < 0)keystr.TimeHour=0;				
+	             }
 				
 				else if(gEvent ==1 && downflag !=0 && keystr.SetupOn ==0){ //风速递减
 						gEvent =0;
@@ -493,7 +512,7 @@ void TaskKeySan(void)
 									keystr.TimeDecadeHour =0;
 									keystr.TimeHour ++;
 									if(keystr.TimeHour == 10){
-										keystr.TimeHour =2;
+										keystr.TimeHour =9;
 									}
 								}
 							}
@@ -638,15 +657,16 @@ void TaskLEDDisplay(void)
 			
 	}
  	TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);//初始化为5级灰度，开显示
-   
+    delay_10us(50);
    TM1650_Set(0x6A,segNumber[keystr.TimeMinute]);//初始化为5级灰度，开显示
-
+   delay_10us(50);
 
    TM1650_Set(0x6C,segNumber[keystr.TimeDecadeHour]);//初始化为5级灰度，开显示
-
+	delay_10us(50);
    if(keystr.windMask == 1)TM1650_Set(0x6E,segNumber[keystr.windLevel]);//显示风速，级别 
    else 
     TM1650_Set(0x6E,segNumber[keystr.TimeHour]);//初始化为5级灰度，开显示
+   delay_10us(50);
    
 }
 /***********************************************************
