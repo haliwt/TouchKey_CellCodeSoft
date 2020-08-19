@@ -50,7 +50,7 @@ enum wind{minWind,smallWind,middleWind,moreWind,maxWind};
 #define SEG9_1      RA3            //��ѡ��SEG9 
 #define SEG9_2      RA4  
 
-#define STB  	    RD0	               //片选信号
+
 
 #define BKLT_R   	RD1	          //BackLight control 2  ---righ led
      

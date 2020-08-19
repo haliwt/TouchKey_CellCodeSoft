@@ -2,7 +2,8 @@
 #define __USART_H__
 #include <cms.h>
 #include "input.h"
-#include "i2c.h"
+#include "tm1620.h"
+
 
 #define PortTx    RA1
 

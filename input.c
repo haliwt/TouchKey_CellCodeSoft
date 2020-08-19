@@ -8,7 +8,7 @@ void GPIO_Init(void)
 
 	WPUD = 0B00000000;
 	
-	TRISA = 0B00000001;				//≈‰÷√IO◊¥Ã¨ 
+	TRISA = 0B00000000;				//≈‰÷√IO◊¥Ã¨ 
 	TRISB = 0B00000000;     		//GPIO B  ‰≥ˆ
 	
 	TRISD = 0B00000000;

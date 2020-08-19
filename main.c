@@ -13,8 +13,9 @@
 #include <cms.h>
 #include "Touch_Kscan_Library.h"
 #include "input.h"
-#include "i2c.h"
+#include "tm1620.h"
 #include "usart.h"
+
 
 
 #define TASK_NUM   (5)                  //  这里定义的任务数为4，表示有4个任务会使用此定时器定时。
@@ -131,8 +132,7 @@ void Init28_System()
 	//DelayXms(200);
 	
 	
-	
-    //PORTA = 0x00;
+	TRISA = 0x00;
 
 	PortTx =1;
 	
@@ -158,7 +158,7 @@ void Refurbish_Sfr()
 //	ANSEL = 0;
 //	ANSELH = 0;
 	
-	//TRISA = 0x0;//x65;
+	 TRISA = 0x0;//x65;
 	TRISB = 0xFF;
 	//TRISA = 0x0;
 	
@@ -273,13 +273,13 @@ void main()
 {
 	
 	Init_System();
-	 IIC_Init_TM1650();
-	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
+	 
 	BKLT_POINT=0;
 
 	while(1)
 	{
-		
+		Tm1620Dis();
+	#if 0
         if(runTimes==0){
 			 runTimes++;
 	         Init28_System();
@@ -301,7 +301,7 @@ Next:		Init_System();
 			TaskLEDDisplay();
 		}
 		
-			
+		#endif 	
 		
 		
 		
@@ -587,8 +587,9 @@ void TaskKeySan(void)
 void TaskLEDDisplay(void)
 {
      static uint16_t timealt =0;
-    // Init_Tm1650();
-	TM1650_Set(0x48,0x31);//初始化为5级灰度，开显示
+    
+	
+	
 	
 	if(keystr.TimerOn ==1 && keystr.SetupOn != 1){
 		
@@ -666,17 +667,7 @@ void TaskLEDDisplay(void)
 			BKLT_L=1;
 			
 	}
- 	TM1650_Set(0x68,segNumber[keystr.TimeBaseUint]);//初始化为5级灰度，开显示
-    delay_10us(50);
-   TM1650_Set(0x6A,segNumber[keystr.TimeMinute]);//初始化为5级灰度，开显示
-   delay_10us(50);
-
-   TM1650_Set(0x6C,segNumber[keystr.TimeDecadeHour]);//初始化为5级灰度，开显示
-	delay_10us(50);
-   if(keystr.windMask == 1)TM1650_Set(0x6E,segNumber[keystr.windLevel]);//显示风速，级别 
-   else 
-    TM1650_Set(0x6E,segNumber[keystr.TimeHour]);//初始化为5级灰度，开显示
-   delay_10us(50);
+ 	Tm1620Dis();
    
 }
 /***********************************************************
