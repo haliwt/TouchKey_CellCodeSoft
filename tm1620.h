@@ -16,6 +16,19 @@
 #define AddrAutoAdd		   0x40//写显示，自动累加地址  
 #define AddrFixed 		   0x44//写显示，固定地址  
  
+
+#define Addr01H  			0xC1//地址01H
+#define Addr02H  			0xC3//地址02H
+#define Addr03H  			0xC5//地址03H
+#define Addr04H  			0xC7//地址04H
+#define Addr05H  			0xC9//地址05H
+#define Addr06H  			0xCB//地址06H
+
+ 
+ 
+#define OpenDisTM1620  0x88//开显示
+#define CloseDisTM1620 0x80//关显示
+ 
 #define Addr00H  			0xC0//地址00H
 #define Addr01H  			0xC1//地址01H
 #define Addr02H  			0xC2//地址02H
@@ -28,8 +41,8 @@
 #define Addr09H  			0xC9//地址09H
 #define Addr0AH  			0xCA//地址0AH
 #define Addr0BH  			0xCB//地址0BH
- 
- 
+
+
 #define OpenDisTM1620  0x88//开显示
 #define CloseDisTM1620 0x80//关显示
  
@@ -41,7 +54,6 @@
 #define Set12_16TM1620 0X05//设置脉冲宽度为 12/16 
 #define Set13_16TM1620 0X06//设置脉冲宽度为 13/16 
 #define Set14_16TM1620 0X07//设置脉冲宽度为 14/16 
-
 
 /**************************************************
 	*XinTong LED Display Data Data:2020.07.23
