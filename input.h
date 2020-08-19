@@ -47,7 +47,7 @@ enum wind{minWind,smallWind,middleWind,moreWind,maxWind};
 #define	LED_KEY6	RB5             //KEY_KILL // 0x04
 #define	LED_KEY7	RB6             //KEY_POWER  // 0x200
 
-#define SEG9_1      RA3            //��ѡ��SEG9 
+#define SEG9_1      RA3            //SEG9 - 1
 #define SEG9_2      RA4  
 
 

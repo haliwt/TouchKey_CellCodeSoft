@@ -534,7 +534,6 @@ void TaskKeySan(void)
 				setupSt  = setupSt ^ 0x01;
 				if(setupSt == 1 && gEvent==1){
 				 gEvent =0;
-				 BKLT_TIM=1;
 				 keystr.SetupOn =1;
 				 BKLT_TIM=1; //turn off
 				 keystr.windMask = 0;
@@ -545,11 +544,11 @@ void TaskKeySan(void)
 				}
 				else if(gEvent ==1){
 					gEvent =0;
-					 BKLT_TIM=0;
+					 BKLT_TIM=0; 
 					 keystr.SetupOn = 0;
 					 downflag = 1;
 					 upflag =1;
-					 BKLT_TIM=0;
+					 
 				}
 			
 			}	
@@ -558,13 +557,14 @@ void TaskKeySan(void)
 				timerSt = timerSt ^ 0x01;
 				if(timerSt ==1 && gEvent ==1){
 				   gEvent =0;
-				   BKLT_TIM=0;
+				   BKLT_TIM=0; //ON 
 				   keystr.TimerOn =1;
 				   keystr.windMask = 0;
 				   getMinute =0 ;
 				   TimerBaseTim = keystr.TimeBaseUint ;
 				   keystr.SetupOn =0;
 				   upflag=0;
+				   BKLT_RL =1;
 				}
 				else if(gEvent ==1){
 					 gEvent =0;
@@ -658,7 +658,7 @@ void TaskLEDDisplay(void)
 				BKLT_TIM=0;
 				
 			}
-			BKLT_TIM=1;
+			BKLT_TIM=0; //Tunr ON
 			
 	}
  	Tm1620Dis();
