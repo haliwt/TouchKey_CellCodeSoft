@@ -276,8 +276,8 @@ void main()
 
 	while(1)
 	{
-		Tm1620Dis();
-	#if 0
+	//	Tm1620Dis();
+	#if 1
         if(runTimes==0){
 			 runTimes++;
 	         Init28_System();

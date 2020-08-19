@@ -90,7 +90,7 @@ void Tm1620Dis(void)
 	  
 	  Tm1620SentData(segNumber[4]); //写数据
     
-     //写第五位数据
+     //写第五位数据  MANI RUN TIME
      STB_TM1620=1; 
 		
      STB_TM1620=0;   
@@ -99,7 +99,7 @@ void Tm1620Dis(void)
 	  
 	    Tm1620SentData(segNumber[5]); //写数据
       
-     //写第6位数据
+     //写第6位数据    MATIN RUN TIME 
      STB_TM1620=1; 
 		
      STB_TM1620=0;   
