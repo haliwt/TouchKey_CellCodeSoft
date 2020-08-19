@@ -11,7 +11,7 @@ void GPIO_Init(void)
 	TRISA = 0B00000000;				//ÅäÖÃIO×´Ì¬ 
 	TRISB = 0B00000000;     		//GPIO B Êä³ö
 	
-	TRISD = 0B00000000;
+	TRISD = 0B10000000;
 	//PORTD = 0B10000011;
 	
 }

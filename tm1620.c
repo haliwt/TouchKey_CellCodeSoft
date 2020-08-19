@@ -71,20 +71,49 @@ void Tm1620Dis(void)
 	
 		Tm1620SentData(segNumber[2]); //写数据
 	
+    //写第三位
     
+    STB_TM1620=1; 
+		
+    STB_TM1620=0;   
+		Tm1620SentData(Addr04H);
+		//指向地址0   
+	
+		Tm1620SentData(segNumber[3]); //写数据
     
+    //写第四位数据
+    STB_TM1620=1; 
+		
+    STB_TM1620=0;   
+    //指向地址6 
+		Tm1620SentData(Addr06H);
+	  
+	  Tm1620SentData(segNumber[4]); //写数据
     
-    
+     //写第五位数据
+     STB_TM1620=1; 
+		
+     STB_TM1620=0;   
+     //指向地址8 
+	  	Tm1620SentData(Addr08H);
+	  
+	    Tm1620SentData(segNumber[5]); //写数据
+      
+     //写第6位数据
+     STB_TM1620=1; 
+		
+     STB_TM1620=0;   
+     //指向地址8 
+	  	Tm1620SentData(Addr0AH);
+	  
+	    Tm1620SentData(segNumber[6]); //写数据  
+      
+      
+      
       STB_TM1620 =1; 
       STB_TM1620 =0; 
-      Tm1620SentData(OpenDisTM1620|Set14_16TM1620); 
+      Tm1620SentData(OpenDisTM1620|Set12_16TM1620); 
       STB_TM1620 =1; 
-       
-     
-   
-	
- 
- 
 }
 //*************************************
 // 函数名称：Tm1620SentData

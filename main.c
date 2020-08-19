@@ -163,7 +163,7 @@ void Refurbish_Sfr()
 	//TRISA = 0x0;
 	
 	
-    TRISD = 0x00;
+    TRISD = 0x80;
 	
 	
 	SSPCON = 0;
@@ -273,8 +273,6 @@ void main()
 {
 	
 	Init_System();
-	 
-	BKLT_POINT=0;
 
 	while(1)
 	{
@@ -346,11 +344,11 @@ void TaskKeySan(void)
 				keyflag_DOWN=0;
 				timedownSt = timedownSt ^ 0x01;
 				if(timedownSt ==1 && gEvent ==1){
-					BKLT_L =1;
+					BKLT_RL =1;
 					
 				}
 				else if(gEvent ==1){
-					BKLT_L =0;
+					BKLT_RL =0;
 					
 				}
 				if(keystr.SetupOn ==1 && gEvent ==1 && downflag == 0){
@@ -434,14 +432,14 @@ void TaskKeySan(void)
 				killSt =killSt ^ 0x01;
 				if(killSt ==1 && gEvent==1){
 					gEvent =0;
-				 	BKLT_R =1;
+				 	BKLT_TIM=1;
 					keystr.KillOn =1;
 					keystr.windMask = 0;
 					upflag=0;
 				}
 				else if(gEvent ==1){
 					gEvent =0;
-					BKLT_R =0;
+					BKLT_TIM=0;
 					keystr.KillOn = 0;
 				}
 			}
@@ -451,16 +449,16 @@ void TaskKeySan(void)
 			    powerSt =powerSt ^ 0x1;
 			    if(powerSt ==1 && gEvent ==1){
 					gEvent =0;
-				    BKLT_R =1;
-				    BKLT_L =1;
+				  
+				   BKLT_RL =1;
 				    keystr.PowerOn =1;
 					keystr.windMask = 0;
 					upflag=0;
 			    }
 			    else if(gEvent==1){
 					gEvent =0;
-			    	BKLT_R =0;
-				    BKLT_L =0;
+			        BKLT_RL =0;
+				 
 				    keystr.PowerOn =0;
 			    }
 				
@@ -472,11 +470,11 @@ void TaskKeySan(void)
 				keyflag_UP=0;
 				 timeupSt = timeupSt ^ 0x01;
 				 if(timeupSt ==1 && gEvent ==1){
-			        BKLT_L =1;//BKLT_L=0;
+			      BKLT_TIM=1;
 					upflag=0;
 				  }
 				 else if(gEvent ==1){
-					  BKLT_L=0;
+					 BKLT_TIM=0;
 					 
 				}
 					
@@ -518,14 +516,14 @@ void TaskKeySan(void)
 			
 				if(runSt ==1 && gEvent == 1){
 					gEvent =0;
-			        BKLT_L =1;// BKLT_POINT=1;
+			        BKLT_TIM=1;
 					keystr.RunOn =1;
 					keystr.windMask = 0;
 					upflag=0;
 				}
 				else if(gEvent ==1){
 					gEvent =0 ;
-					BKLT_L = 0;
+					BKLT_TIM=0;
 					keystr.RunOn =0;
 				}
 			  
@@ -536,7 +534,7 @@ void TaskKeySan(void)
 				setupSt  = setupSt ^ 0x01;
 				if(setupSt == 1 && gEvent==1){
 				 gEvent =0;
-				 BKLT_R=1;
+				 BKLT_TIM=1;
 				 keystr.SetupOn =1;
 				 BKLT_TIM=1; //turn off
 				 keystr.windMask = 0;
@@ -547,10 +545,11 @@ void TaskKeySan(void)
 				}
 				else if(gEvent ==1){
 					gEvent =0;
-					 BKLT_R=0;
+					 BKLT_TIM=0;
 					 keystr.SetupOn = 0;
 					 downflag = 1;
 					 upflag =1;
+					 BKLT_TIM=0;
 				}
 			
 			}	
@@ -587,11 +586,7 @@ void TaskKeySan(void)
 void TaskLEDDisplay(void)
 {
      static uint16_t timealt =0;
-    
-	
-	
-	
-	if(keystr.TimerOn ==1 && keystr.SetupOn != 1){
+    	if(keystr.TimerOn ==1 && keystr.SetupOn != 1){
 		
 						runTimes = 0x05;
 						 
@@ -660,11 +655,10 @@ void TaskLEDDisplay(void)
 			   
 			if(keystr.TimeMinute==0 && keystr.TimeBaseUint==0 && keystr.TimeDecadeHour==0 && keystr.TimeHour==0 ){
 				keystr.TimerOn == 0;
-				BKLT_R=0;
-				BKLT_L=0;
+				BKLT_TIM=0;
+				
 			}
-			BKLT_R=1;
-			BKLT_L=1;
+			BKLT_TIM=1;
 			
 	}
  	Tm1620Dis();
@@ -681,9 +675,9 @@ void TaskLEDDisplay(void)
 void TaskReceiveIR(void)
 {
   
-  BKLT_R=0;
-  BKLT_L=0;
-  delay_10us(1000);
+  
+ 
+ 
 
 }
 /***********************************************************************************************
@@ -696,7 +690,6 @@ void TaskReceiveIR(void)
 *************************************************************************************************/
 void TaskTelecStatus(void)
 {
-     BKLT_R=1;
    
    // USART_SendData(data);
 }

@@ -52,12 +52,13 @@ enum wind{minWind,smallWind,middleWind,moreWind,maxWind};
 
 
 
-#define BKLT_R   	RD1	          //BackLight control 2  ---righ led
+#define IR_OUT   	RD1	        //IR OUT PWM
      
-#define BKLT_L      RA7       //BackLigh control 1---left led 
+#define BKLT_RL      RA7       //BackLigh control 1---left and left led 
 
-#define BKLT_POINT     RD7        //BackLigh   radix point
-#define BKLT_TIM  	   RD6        //Timer BackLigt control 
+#define IR_RE_DATA     RD7        //IR_Receive DATA Input GPIO 
+
+#define BKLT_TIM  	   RD6        //Timer BackLigt control AND clock backlight 
 
 
 
