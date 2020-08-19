@@ -333,7 +333,7 @@ void LEDDisplay_Run0(void)
 {
   uint8_t disp=0;
   TM1650_Set(0x68,segNumber[11]);//初始化为5级灰度，开显示
-  COM0_RUN =0;
+  
   
   TM1650_Set(0x68,segNumber[1]);//初始化为5级灰度，开显示
    

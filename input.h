@@ -47,16 +47,17 @@ enum wind{minWind,smallWind,middleWind,moreWind,maxWind};
 #define	LED_KEY6	RB5             //KEY_KILL // 0x04
 #define	LED_KEY7	RB6             //KEY_POWER  // 0x200
 
-#define     SEG9        RA3            //��ѡ��SEG9 
-#define     COM0_RUN  	RD0	           //COM0_RUN
-#define     COM1_RUN  	RD1	
+#define SEG9_1      RA3            //��ѡ��SEG9 
+#define SEG9_2      RA4  
 
+#define STB  	    RD0	               //片选信号
 
-#define     BKLT_R  	RD6	        //BackLight control 2  ---righ led
-#define     BKLT_L      RA4        //BackLigh control 1---left led 
+#define BKLT_R   	RD1	          //BackLight control 2  ---righ led
+     
+#define BKLT_L      RA7       //BackLigh control 1---left led 
 
-#define     BKLT_POINT     RA7        //BackLigh   radix point
-#define     BKLT_TIM  	   RD7        //Timer BackLigt control 
+#define BKLT_POINT     RD7        //BackLigh   radix point
+#define BKLT_TIM  	   RD6        //Timer BackLigt control 
 
 
 

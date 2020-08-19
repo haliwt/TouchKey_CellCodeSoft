@@ -188,7 +188,12 @@ void Refurbish_Sfr()
 
 
 /***********************************************************
-键处理函数
+ * *
+    *Function Name : void KeyServer(void)
+	*Function :键处理函数
+	*Input Ref:
+	*Return Ref:
+	*
 ***********************************************************/
 void KeyServer()
 {
