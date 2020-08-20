@@ -412,10 +412,11 @@ void TaskKeySan(void)
 				else if(gEvent ==1 && downflag !=0 && keystr.SetupOn ==0){ //风速递减
 						gEvent =0;
 						keystr.windMask =1;
-						if(keystr.windLevel <= 0 )
-						    keystr.windLevel =0 ;
+						if(keystr.windLevel <=0)
+						    keystr.windLevel = 1;
 						else {
 						     keystr.windLevel --;//minWind;
+						     if(keystr.windLevel == 0)keystr.windLevel = 1;
 					     }
 				}
 			   
@@ -424,20 +425,20 @@ void TaskKeySan(void)
 	if(keyflag_KILL ==1){  //KEY_KILL ??
 				keyflag_KILL=0;
 				killSt =killSt ^ 0x01;
+				keystr.windMask =1;
 				if(killSt ==1 && gEvent==1){
 					gEvent =0;
-				 	BKLT_R=1;
+				 	
 					keystr.KillOn =1;
 				
-					upflag=0;
 				}
 				else if(gEvent ==1){
 					gEvent =0;
-					BKLT_R=0;
+					
 					keystr.KillOn = 0;
 				}
 			}
-			if(keyflag_POWER ==1){  //KE_POWER  
+	if(keyflag_POWER ==1){  //KE_POWER  
 				keyflag_POWER=0;
 			
 			    powerSt =powerSt ^ 0x1;
@@ -464,11 +465,11 @@ void TaskKeySan(void)
 				keyflag_UP=0;
 				 timeupSt = timeupSt ^ 0x01;
 				 if(timeupSt ==1 && gEvent ==1){
-			      		BKLT_L=1;
+			      		 BKLT_TIM=0; //Turn On
 						
 				  }
 				 else if(gEvent ==1){
-					 BKLT_L=0;
+					  BKLT_TIM= 1; //Turn off
 					 
 				}
 				if(keystr.SetupOn ==1 && gEvent ==1  && upflag == 0){
@@ -497,12 +498,12 @@ void TaskKeySan(void)
 				else if(gEvent ==1 && upflag ==1 && keystr.SetupOn ==0){ //UP 
 					 	gEvent =0;
 						keystr.windMask = 1;
-						
+						keystr.windLevel ++ ;
 					    if(keystr.windLevel >4){//if(keystr.windLevel >maxWind){
-						   keystr.windLevel = 0;//minWind;
+						   keystr.windLevel = 1;//minWind;
 					    }
-					    else 
-					        keystr.windLevel ++ ;
+					    
+					        
 				}		
 			}
 			if(keyflag_RUN ==1){//KEY_RUN  //0X400;  OK
@@ -511,14 +512,14 @@ void TaskKeySan(void)
 			
 				if(runSt ==1 && gEvent == 1){
 					gEvent =0;
-			        BKLT_L=1;
+			       BKLT_TIM=0; //Turn On
 					keystr.RunOn =1;
 				
 					upflag=0;
 				}
 				else if(gEvent ==1){
 					gEvent =0 ;
-					BKLT_L=0;
+					BKLT_TIM=1; //turn off
 					keystr.RunOn =0;
 				}
 			  

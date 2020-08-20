@@ -163,7 +163,7 @@ void  Tm1620_RunDisp(void)
      //指向地址8 
       Tm1620SentData(Addr08H);
     
-      Tm1620SentData(segNumber[6]); //写数据 //Tm1620SentData(segNumber[keystr.windLevel]); //写数据
+      Tm1620SentData(segNumber[keystr.KillOn]); //写数据 //Tm1620SentData(segNumber[keystr.windLevel]); //写数据
       
      //写第6位数据    MATIN RUN TIME 
      STB_TM1620=1; 
