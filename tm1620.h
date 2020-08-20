@@ -102,8 +102,10 @@ const unsigned char segNumber[]={
 void delay_13us(uint16_t n);
 
 void  delay_14us(uint16_t n);
+void  Tm1620_RunDisp(void);
 void Tm1620Dis(void);
 void Tm1620SentData(uint8_t TM1620Data);
+
 
 
 #endif 

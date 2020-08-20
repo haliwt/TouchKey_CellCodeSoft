@@ -411,10 +411,11 @@ void TaskKeySan(void)
 										
 				else if(gEvent ==1 && downflag !=0 && keystr.SetupOn ==0){ //风速递减
 						gEvent =0;
-						if(keystr.windLevel >minWind && keystr.windLevel <=maxWind)
-						    keystr.windLevel -- ;
+						keystr.windMask =1;
+						if(keystr.windLevel <= 0 )
+						    keystr.windLevel =0 ;
 						else {
-						     keystr.windLevel =minWind;
+						     keystr.windLevel --;//minWind;
 					     }
 				}
 			   
@@ -464,7 +465,7 @@ void TaskKeySan(void)
 				 timeupSt = timeupSt ^ 0x01;
 				 if(timeupSt ==1 && gEvent ==1){
 			      		BKLT_L=1;
-						upflag=0;
+						
 				  }
 				 else if(gEvent ==1){
 					 BKLT_L=0;
@@ -491,15 +492,17 @@ void TaskKeySan(void)
 						}	
 							
 							
-					}
+				}
 				
-				else if(gEvent ==1 && upflag ==1 && keystr.SetupOn ==0){
+				else if(gEvent ==1 && upflag ==1 && keystr.SetupOn ==0){ //UP 
 					 	gEvent =0;
 						keystr.windMask = 1;
-						keystr.windLevel ++ ;
-					   if(keystr.windLevel >maxWind){
-						   keystr.windLevel = minWind;
-					   }
+						
+					    if(keystr.windLevel >4){//if(keystr.windLevel >maxWind){
+						   keystr.windLevel = 0;//minWind;
+					    }
+					    else 
+					        keystr.windLevel ++ ;
 				}		
 			}
 			if(keyflag_RUN ==1){//KEY_RUN  //0X400;  OK
@@ -653,7 +656,12 @@ void TaskLEDDisplay(void)
 			BKLT_TIM=0; //Tunr ON
 			
 	}
- 	Tm1620Dis();
+	if(keystr.windMask ==0)
+ 	  Tm1620Dis();
+ 	if(keystr.windMask ==1){
+ 		keystr.windMask = 0;
+ 		Tm1620_RunDisp();
+ 	}
    
 }
 /***********************************************************
