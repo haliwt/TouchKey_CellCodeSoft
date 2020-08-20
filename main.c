@@ -77,15 +77,16 @@ void Init_System()
 	asm("nop");
 	asm("clrwdt");
 	INTCON = 0;				//禁止中断
-	OSCCON = 0X71;			//配置振荡为8M
+	OSCCON = 0X71;			//配置振荡为8M  指令周期4个，执行一条指令，单指令 = 0.5us 双指令：1us
 	OPTION_REG = 0;
 	GPIO_Init();
 	//延时等待电源电压稳定
 	//DelayXms(200);
 	
 	
-	//TRISA = 0x0;
-    //PORTA = 0x00;
+	TRISA = 0x00;
+	
+
 
 		PortTx =1;
 	
@@ -133,6 +134,7 @@ void Init28_System()
 	
 	
 	TRISA = 0x00;
+	TRISB = 0xFF;
 
 	PortTx =1;
 	
@@ -158,13 +160,10 @@ void Refurbish_Sfr()
 //	ANSEL = 0;
 //	ANSELH = 0;
 	
-	 TRISA = 0x0;//x65;
-	TRISB = 0xFF;
-	//TRISA = 0x0;
-	
-	
-    TRISD = 0x80;
-	
+	 TRISA = 0x00;//x65;
+	 TRISB = 0xFF;
+	 TRISD = 0x80;
+	 
 	
 	SSPCON = 0;
 	EECON1 = 0;
@@ -276,16 +275,14 @@ void main()
 
 	while(1)
 	{
-	//	Tm1620Dis();
-	#if 1
-        if(runTimes==0){
+	   
+	    if(runTimes==0){
 			 runTimes++;
 	         Init28_System();
 			 WriteByte(keystr.SendData) ;
 			goto Next;
 		 }
-
-	    if(B_MainLoop)
+		if(B_MainLoop)
 		{
 Next:		Init_System();
             B_MainLoop = 0;
@@ -297,13 +294,10 @@ Next:		Init_System();
 			TaskKeySan();
 			
 			TaskLEDDisplay();
+			IR_ReadData();
 		}
 		
-		#endif 	
-		
-		
-		
-	}
+		}
 }
 /***********************************************************
 	*
@@ -344,11 +338,11 @@ void TaskKeySan(void)
 				keyflag_DOWN=0;
 				timedownSt = timedownSt ^ 0x01;
 				if(timedownSt ==1 && gEvent ==1){
-					BKLT_RL =1;
+					BKLT_L =0; //ON 
 					
 				}
 				else if(gEvent ==1){
-					BKLT_RL =0;
+					BKLT_L =1; //OFF
 					
 				}
 				if(keystr.SetupOn ==1 && gEvent ==1 && downflag == 0){
@@ -417,7 +411,6 @@ void TaskKeySan(void)
 										
 				else if(gEvent ==1 && downflag !=0 && keystr.SetupOn ==0){ //风速递减
 						gEvent =0;
-						keystr.windMask = 1;
 						if(keystr.windLevel >minWind && keystr.windLevel <=maxWind)
 						    keystr.windLevel -- ;
 						else {
@@ -432,14 +425,14 @@ void TaskKeySan(void)
 				killSt =killSt ^ 0x01;
 				if(killSt ==1 && gEvent==1){
 					gEvent =0;
-				 	BKLT_TIM=1;
+				 	BKLT_R=1;
 					keystr.KillOn =1;
-					keystr.windMask = 0;
+				
 					upflag=0;
 				}
 				else if(gEvent ==1){
 					gEvent =0;
-					BKLT_TIM=0;
+					BKLT_R=0;
 					keystr.KillOn = 0;
 				}
 			}
@@ -449,16 +442,16 @@ void TaskKeySan(void)
 			    powerSt =powerSt ^ 0x1;
 			    if(powerSt ==1 && gEvent ==1){
 					gEvent =0;
-				  
-				   BKLT_RL =1;
+				  	BKLT_L =1;
+				    BKLT_R =1;
 				    keystr.PowerOn =1;
 					keystr.windMask = 0;
 					upflag=0;
 			    }
 			    else if(gEvent==1){
 					gEvent =0;
-			        BKLT_RL =0;
-				 
+			        BKLT_R =0;
+				    BKLT_L= 0;
 				    keystr.PowerOn =0;
 			    }
 				
@@ -470,15 +463,14 @@ void TaskKeySan(void)
 				keyflag_UP=0;
 				 timeupSt = timeupSt ^ 0x01;
 				 if(timeupSt ==1 && gEvent ==1){
-			      BKLT_TIM=1;
-					upflag=0;
+			      		BKLT_L=1;
+						upflag=0;
 				  }
 				 else if(gEvent ==1){
-					 BKLT_TIM=0;
+					 BKLT_L=0;
 					 
 				}
-					
-					if(keystr.SetupOn ==1 && gEvent ==1  && upflag == 0){
+				if(keystr.SetupOn ==1 && gEvent ==1  && upflag == 0){
 						gEvent =0;
 					
 						keystr.TimeBaseUint ++ ;
@@ -516,14 +508,14 @@ void TaskKeySan(void)
 			
 				if(runSt ==1 && gEvent == 1){
 					gEvent =0;
-			        BKLT_TIM=1;
+			        BKLT_L=1;
 					keystr.RunOn =1;
-					keystr.windMask = 0;
+				
 					upflag=0;
 				}
 				else if(gEvent ==1){
 					gEvent =0 ;
-					BKLT_TIM=0;
+					BKLT_L=0;
 					keystr.RunOn =0;
 				}
 			  
@@ -535,8 +527,8 @@ void TaskKeySan(void)
 				if(setupSt == 1 && gEvent==1){
 				 gEvent =0;
 				 keystr.SetupOn =1;
-				 BKLT_TIM=1; //turn off
-				 keystr.windMask = 0;
+				 BKLT_R=1; //turn off
+			
 				 keystr.TimerOn =0;
 				 TimerBaseTim=0;
 				 upflag=0;
@@ -544,7 +536,7 @@ void TaskKeySan(void)
 				}
 				else if(gEvent ==1){
 					gEvent =0;
-					 BKLT_TIM=0; 
+					 BKLT_R=0; 
 					 keystr.SetupOn = 0;
 					 downflag = 1;
 					 upflag =1;
@@ -559,17 +551,17 @@ void TaskKeySan(void)
 				   gEvent =0;
 				   BKLT_TIM=0; //ON 
 				   keystr.TimerOn =1;
-				   keystr.windMask = 0;
 				   getMinute =0 ;
 				   TimerBaseTim = keystr.TimeBaseUint ;
 				   keystr.SetupOn =0;
 				   upflag=0;
-				   BKLT_RL =1;
+				   BKLT_R =1;
 				}
 				else if(gEvent ==1){
 					 gEvent =0;
 					BKLT_TIM=1; //turn off
 					keystr.TimerOn =0;
+					 BKLT_R =0;
 				}
 			}
 			Refurbish_Sfr();

@@ -1,6 +1,26 @@
 #include "tm1620.h"
-
-
+/******************************************************************
+    *
+    *Function Name:void delay_1us(uint16_t n)
+    *Function :delay times
+    *Input Ref:
+    *Return Ref:
+    *
+*******************************************************************/
+void delay_13us(uint16_t n)
+{
+     uint16_t i,j=0;
+	for(i=0;i<n;i++)
+	{
+    for(j=0;j<1;j++){
+     // asm("nop"); //0.5us
+      //asm("nop");
+     // asm("nop"); //0.5us
+     // asm("nop");
+     // asm("nop"); //0.5us
+      }
+   }	
+}
 /******************************************************************
     *
     *Function Name:void delay_10us(uint16_t n)
@@ -59,7 +79,7 @@ void Tm1620Dis(void)
 		Tm1620SentData(Addr00H);
 		//指向地址0   
 	
-		Tm1620SentData(segNumber[1]); //写数据
+		Tm1620SentData(segNumber[keystr.TimeHour]); //写数据//Tm1620SentData(segNumber[keystr.TimeBaseUint]); //写数据
 	
       //写第二位 
       
@@ -69,7 +89,7 @@ void Tm1620Dis(void)
 		Tm1620SentData(Addr02H);
 		//指向地址0   
 	
-		Tm1620SentData(segNumber[2]); //写数据
+		Tm1620SentData(segNumber[keystr.TimeDecadeHour]); //写数据//Tm1620SentData(segNumber[keystr.TimeMinute]); //写数据
 	
     //写第三位
     
@@ -79,7 +99,7 @@ void Tm1620Dis(void)
 		Tm1620SentData(Addr04H);
 		//指向地址0   
 	
-		Tm1620SentData(segNumber[3]); //写数据
+	   Tm1620SentData(segNumber[keystr.TimeMinute]); //写数据
     
     //写第四位数据
     STB_TM1620=1; 
@@ -88,7 +108,7 @@ void Tm1620Dis(void)
     //指向地址6 
 		Tm1620SentData(Addr06H);
 	  
-	  Tm1620SentData(segNumber[4]); //写数据
+	  Tm1620SentData(segNumber[keystr.TimeBaseUint]); //写数据//Tm1620SentData(segNumber[keystr.TimeHour]); //写数据
     
      //写第五位数据  MANI RUN TIME
      STB_TM1620=1; 
@@ -97,7 +117,7 @@ void Tm1620Dis(void)
      //指向地址8 
 	  	Tm1620SentData(Addr08H);
 	  
-	    Tm1620SentData(segNumber[5]); //写数据
+	    Tm1620SentData(segNumber[6]); //写数据 //Tm1620SentData(segNumber[keystr.windLevel]); //写数据
       
      //写第6位数据    MATIN RUN TIME 
      STB_TM1620=1; 
@@ -106,7 +126,7 @@ void Tm1620Dis(void)
      //指向地址8 
 	  	Tm1620SentData(Addr0AH);
 	  
-	    Tm1620SentData(segNumber[6]); //写数据  
+	    Tm1620SentData(segNumber[1]); //写数据//Tm1620SentData(segNumber[keystr.windLevel]); //写数据
       
       
       

@@ -17,6 +17,7 @@ struct _KEY_STRUCT_
     uint8_t PowerOn : 1;     //????----???
     uint8_t RunOn: 1;       //????----???
     uint8_t windMask :1;
+    uint8_t BackLed_On: 1 ;
     
     uint8_t TimeBaseUint;    //
     uint8_t TimeHour ;
@@ -52,11 +53,10 @@ enum wind{minWind,smallWind,middleWind,moreWind,maxWind};
 
 
 
-#define IR_OUT   	RD1	        //IR OUT PWM
-     
-#define BKLT_RL      RA7       //BackLigh control 1---left and left led 
+#define  BKLT_R   	RD1	        //BackLigh control 1---right led
+#define  BKLT_L     RA7       //BackLigh control 1---left led
 
-#define IR_RE_DATA     RD7        //IR_Receive DATA Input GPIO 
+#define IR_RE_DATA     RD7        //IR_Receive DATA Input GPIO <------"number dot"
 
 #define BKLT_TIM  	   RD6        //Timer BackLigt control AND clock backlight 
 
@@ -77,7 +77,7 @@ unsigned char keyflag_SETUP = 0;
 
 
 void GPIO_Init(void);
-
+void IR_ReadData(void);
 
 	
 
