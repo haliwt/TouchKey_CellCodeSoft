@@ -86,11 +86,6 @@ void Init_System()
 	
 	TRISA = 0x00;
 	
-
-
-		PortTx =1;
-	
-	
 	TRISB = 0xff; //inpute port;
 	
 	TRISD = 0x00;

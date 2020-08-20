@@ -162,9 +162,14 @@ void  Tm1620_RunDisp(void)
      STB_TM1620=0;   
      //指向地址8 
       Tm1620SentData(Addr08H);
-    
-      Tm1620SentData(segNumber[keystr.KillOn]); //写数据 //Tm1620SentData(segNumber[keystr.windLevel]); //写数据
       
+      Tm1620SentData(segNumber[keystr.KillOn]); //写数据 //Tm1620SentData(segNumber[keystr.windLevel]); //写数据
+      if(keystr.KillOn== 1 || keystr.KillOn== 4 || keystr.KillOn== 7){
+         SEG9_1 =0;
+      }
+      else {
+        SEG9_1 =1;
+      }
      //写第6位数据    MATIN RUN TIME 
      STB_TM1620=1; 
     
@@ -173,7 +178,14 @@ void  Tm1620_RunDisp(void)
       Tm1620SentData(Addr0AH);
     
       Tm1620SentData(segNumber[keystr.windLevel]); //写数据
-      
+      if(keystr.windLevel == 1 || keystr.windLevel == 4 ||keystr.windLevel== 7)
+      {
+        SEG9_2 = 0;
+      }
+      else {
+
+        SEG9_2 = 1;
+      }
       
       
       STB_TM1620 =1; 
