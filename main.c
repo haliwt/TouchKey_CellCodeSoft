@@ -24,6 +24,7 @@
  static uint8_t gEvent = 0;      //g = globe
  static uint16_t getMinute=0;
  static uint16_t getHour=0;
+ volatile uint8_t KeyID ;
 
 uint16_t TaskCount[TASK_NUM] ;           //  这里为4个任务定义4个变量来存放定时值
 uint8_t  TaskMark[TASK_NUM];             //  同样对应4个标志位，为0表示时间没到，为1表示定时时间到。
@@ -205,41 +206,41 @@ void KeyServer()
 				
 				case 0x4: //KEY_KILL
 				
-				  keyflag_KILL =1;//KEY_KILL
+				  KeyID = keyflag_KILL;//KEY_KILL
 				   gEvent =1;
 				  break;
 				case 0x8://KEY_DOWN //0x08
 				
-				     keyflag_DOWN =1; //
+				     KeyID = keyflag_DOWN; //
 					 gEvent =1;
 					 break;
 			
 			
 				case 0x40://KEY_SETUP
 				
-				      keyflag_SETUP =1;// KEY_SETUP
+				      KeyID = keyflag_SETUP ;// KEY_SETUP
 				       gEvent =1;
 					 
 				break;
 				
 				
 			  case 0x80: //KEY _UP   // 0x100
-				     keyflag_UP =1;
+				    KeyID = keyflag_UP ;
 					 gEvent =1;
 					break;
 					
 				case 0x200: //KEY_POWER
-				      keyflag_POWER =1;//KEY_POWER  
+				     KeyID =  keyflag_POWER ;//KEY_POWER  
 					   gEvent =1;
 					break;
 					
 				case 0x400://KEY_RUN  //0X400;
-			          keyflag_RUN =1;
+			          KeyID = keyflag_RUN ;
 					   gEvent =1;
 					break;
 					
 				case 0x800://KEY_TIMER 0x800
-				   keyflag_TIMER=1;
+				   KeyID = keyflag_TIMER;
 				    gEvent =1;
 				  
 				break;
@@ -330,8 +331,11 @@ void TaskKeySan(void)
 	static uint8_t powerSt =0,timeupSt=0,runSt=0,timerSt=0,timedownSt=0;
 	static uint8_t killSt = 0,setupSt = 0,tempuint=1,upflag=0,downflag =0;
 	
-	if(keyflag_DOWN ==1){//KEY_DOWN //0x08
-				keyflag_DOWN=0;
+	switch(KeyID){
+		
+		case keyflag_DOWN:
+	//KEY_DOWN //0x08
+			
 				timedownSt = timedownSt ^ 0x01;
 				if(timedownSt ==1 && gEvent ==1){
 					BKLT_L =0; //ON 
@@ -417,9 +421,11 @@ void TaskKeySan(void)
 				}
 			   
 		
-	}
-	if(keyflag_KILL ==1){  //KEY_KILL ??
-				keyflag_KILL=0;
+	 break ;
+	 
+	 case keyflag_KILL:
+	
+			
 				killSt =killSt ^ 0x01;
 				keystr.windMask =1;
 				if(killSt ==1 && gEvent==1){
@@ -433,9 +439,10 @@ void TaskKeySan(void)
 					BKLT_TIM= 1; //Turn off
 					keystr.KillOn = 0;
 				}
-			}
-	if(keyflag_POWER ==1){  //KE_POWER  
-				keyflag_POWER=0;
+	break;
+	
+	case keyflag_POWER :
+	
 			
 			    powerSt =powerSt ^ 0x1;
 			    if(powerSt ==1 && gEvent ==1){
@@ -459,10 +466,11 @@ void TaskKeySan(void)
 				
 				
 				
-			}
+	break ;
+	
+	case keyflag_UP:
 			
-			if(keyflag_UP ==1){//KEY _UP   // 0x100
-				keyflag_UP=0;
+		
 				 timeupSt = timeupSt ^ 0x01;
 				 if(timeupSt ==1 && gEvent ==1){
 			      		 BKLT_TIM=0; //Turn On
@@ -511,9 +519,10 @@ void TaskKeySan(void)
 					    keystr.windLevel ++ ;
 					        
 				}		
-			}
-			if(keyflag_RUN ==1){//KEY_RUN  //0X400;  OK
-				keyflag_RUN=0;
+		break;
+		
+		case keyflag_RUN:
+			
 				runSt = runSt ^ 0x01;
 			
 				if(runSt ==1 && gEvent == 1){
@@ -530,9 +539,10 @@ void TaskKeySan(void)
 				}
 			  
 			
-			}
-			if(keyflag_SETUP ==1){// KEY_SETUP ??
-				keyflag_SETUP=0;
+		break;
+		
+		case keyflag_SETUP:
+			
 				setupSt  = setupSt ^ 0x01;
 				if(setupSt == 1 && gEvent==1){
 				 gEvent =0;
@@ -553,9 +563,10 @@ void TaskKeySan(void)
 					 
 				}
 			
-			}	
-			if(keyflag_TIMER ==1){//KEY_TIMER 0x800
-				keyflag_TIMER=0;
+		break;
+		
+		case 	keyflag_TIMER:
+			
 				timerSt = timerSt ^ 0x01;
 				if(timerSt ==1 && gEvent ==1){
 				   gEvent =0;
@@ -575,6 +586,15 @@ void TaskKeySan(void)
 					 upflag=0;
 				     downflag =0;
 					
+				}
+			
+	    break ;
+	}
+			if(keystr.TimerOn ==1 && keystr.SetupOn != 1)
+			{
+				if(keystr.TimeBaseUint== 0 && keystr.TimeMinute==0 && keystr.TimeDecadeHour==0 && keystr.TimeHour==0){
+						BKLT_TIM=1; //Tunr OFF
+						keystr.TimerOn =0;
 				}
 			}
 			Refurbish_Sfr();
@@ -625,7 +645,7 @@ void TaskLEDDisplay(void)
 										}
 										else{
 										    keystr.TimeBaseUint=9;
-											keystr.TimeMinute=9;//借一当十
+											keystr.TimeMinute=5;//借一当5  60分钟 进位 “小时”
 											
 											if(keystr.TimeDecadeHour ==0){
 												
@@ -645,7 +665,7 @@ void TaskLEDDisplay(void)
 											else if(keystr.TimeDecadeHour > 0){
 												
 												keystr.TimeDecadeHour --	;					  
-												keystr.TimeMinute=9;//借一当十
+												keystr.TimeMinute=5;//借一当5
 												 keystr.TimeBaseUint=9;
 												
 											}

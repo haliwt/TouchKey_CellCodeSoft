@@ -66,13 +66,13 @@ enum wind{minWind,smallWind,middleWind,moreWind,maxWind};
 
 
 
-unsigned char keyflag_POWER = 0;
-unsigned char keyflag_UP = 0;
-unsigned char keyflag_DOWN= 0;
-unsigned char keyflag_TIMER = 0;
-unsigned char keyflag_RUN = 0;
-unsigned char keyflag_KILL = 0;
-unsigned char keyflag_SETUP = 0;					
+#define    keyflag_POWER   1
+#define    keyflag_RUN     2
+#define    keyflag_KILL    3
+#define    keyflag_SETUP   4
+#define    keyflag_UP      5
+#define    keyflag_DOWN    6
+#define    keyflag_TIMER   7					
 
 
 
