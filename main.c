@@ -370,7 +370,7 @@ void TaskKeySan(void)
 										}
 										else{
 											keystr.TimeBaseUint=9;
-											keystr.TimeMinute=9;//借一当十
+											keystr.TimeMinute=5;//借一当5  60分钟
 											
 											if(keystr.TimeDecadeHour ==0){
 												
@@ -390,7 +390,7 @@ void TaskKeySan(void)
 											else if(keystr.TimeDecadeHour > 0){
 												
 												keystr.TimeDecadeHour --	;					  
-												keystr.TimeMinute=9;//借一当十
+												keystr.TimeMinute=5;//借一当5
 												keystr.TimeBaseUint=9;
 												
 											}
@@ -479,14 +479,20 @@ void TaskKeySan(void)
 						if(keystr.TimeBaseUint == 10){
 							keystr.TimeBaseUint=0;
 							keystr.TimeMinute++;
-							if(keystr.TimeMinute==10){
+							if(keystr.TimeMinute==6){ 
 								keystr.TimeMinute =0;
 								keystr.TimeDecadeHour ++;
-								if(keystr.TimeDecadeHour ==10){
+								if(keystr.TimeDecadeHour ==10){ //小时
 									keystr.TimeDecadeHour =0;
 									keystr.TimeHour ++;
-									if(keystr.TimeHour == 10){
-										keystr.TimeHour =9;
+									if(keystr.TimeHour == 2){
+										if(keystr.TimeDecadeHour==4){
+											keystr.TimeBaseUint=0;
+											keystr.TimeMinute=0;
+											keystr.TimeDecadeHour=0;
+											keystr.TimeHour=0;
+										}
+
 									}
 								}
 							}
@@ -573,6 +579,7 @@ void TaskKeySan(void)
 			}
 			Refurbish_Sfr();
 			keystr.SendData = keystr.PowerOn << 7 | keystr.RunOn << 6 | keystr.KillOn << 5 | keystr.windLevel ;
+
 }
 /***********************************************************
 	*
@@ -651,14 +658,8 @@ void TaskLEDDisplay(void)
 						   }						  
 						} 
 					}	
-			#if 0   
-			if(keystr.TimeMinute==0 && keystr.TimeBaseUint==0 && keystr.TimeDecadeHour==0 && keystr.TimeHour==0 ){
-				keystr.TimerOn == 0;
-				BKLT_TIM=0;
-				
-			}
+			
 			BKLT_TIM=0; //Tunr ON
-			#endif 
 			Tm1620Dis();
 	}
 	else if(keystr.windMask ==0)
