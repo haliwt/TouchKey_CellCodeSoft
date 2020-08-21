@@ -275,7 +275,7 @@ void main()
 	    if(runTimes==0){
 			 runTimes++;
 	         Init28_System();
-			 WriteByte(keystr.SendData) ;
+			 WriteByte(keystr.SendData | 0x88) ;
 			goto Next;
 		 }
 		if(B_MainLoop)
@@ -472,7 +472,7 @@ void TaskKeySan(void)
 					  BKLT_TIM= 1; //Turn off
 					 
 				}
-				if(keystr.SetupOn ==1 && gEvent ==1 ){
+				if(keystr.SetupOn ==1 && gEvent ==1 && upflag ==1){
 						gEvent =0;
 					
 						keystr.TimeBaseUint ++ ;
@@ -578,7 +578,7 @@ void TaskKeySan(void)
 				}
 			}
 			Refurbish_Sfr();
-			keystr.SendData = keystr.PowerOn << 7 | keystr.RunOn << 6 | keystr.KillOn << 5 | keystr.windLevel ;
+			keystr.SendData = (keystr.PowerOn << 6 | keystr.RunOn << 5 | keystr.KillOn << 4 | keystr.windLevel)  ;
 
 }
 /***********************************************************
