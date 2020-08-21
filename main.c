@@ -267,6 +267,7 @@ void main()
 {
 	
 	Init_System();
+	PowerOn_RunDisp();
 
 	while(1)
 	{
@@ -340,7 +341,7 @@ void TaskKeySan(void)
 					BKLT_L =1; //OFF
 					
 				}
-				if(keystr.SetupOn ==1 && gEvent ==1 && downflag == 0){
+				if(keystr.SetupOn ==1 && gEvent ==1){
 					   gEvent =0;
 						if(keystr.TimeBaseUint == 0)keystr.TimeBaseUint =1;
 						keystr.TimeBaseUint --;
@@ -404,7 +405,7 @@ void TaskKeySan(void)
 					}	
 				}    
 										
-				else if(gEvent ==1 && downflag !=0 && keystr.SetupOn ==0){ //风速递减
+				else if(gEvent ==1 && downflag ==0 && keystr.SetupOn ==0){ //风速递减
 						gEvent =0;
 						keystr.windMask =1;
 						if(keystr.windLevel <=0)
@@ -425,11 +426,11 @@ void TaskKeySan(void)
 					gEvent =0;
 				 	
 					keystr.KillOn =1;
-				
+				    BKLT_TIM= 0; //Turn On
 				}
 				else if(gEvent ==1){
 					gEvent =0;
-					
+					BKLT_TIM= 1; //Turn off
 					keystr.KillOn = 0;
 				}
 			}
@@ -442,14 +443,18 @@ void TaskKeySan(void)
 				  	BKLT_L =1;
 				    BKLT_R =1;
 				    keystr.PowerOn =1;
-					keystr.windMask = 0;
 					upflag=0;
+					
 			    }
 			    else if(gEvent==1){
 					gEvent =0;
 			        BKLT_R =0;
 				    BKLT_L= 0;
+				    keystr.windMask = 1;
 				    keystr.PowerOn =0;
+				    keystr.windLevel=0;
+				    keystr.BackLed_On = 1;
+
 			    }
 				
 				
@@ -467,7 +472,7 @@ void TaskKeySan(void)
 					  BKLT_TIM= 1; //Turn off
 					 
 				}
-				if(keystr.SetupOn ==1 && gEvent ==1  && upflag == 0){
+				if(keystr.SetupOn ==1 && gEvent ==1 ){
 						gEvent =0;
 					
 						keystr.TimeBaseUint ++ ;
@@ -490,14 +495,14 @@ void TaskKeySan(void)
 							
 				}
 				
-				else if(gEvent ==1 && upflag ==1 && keystr.SetupOn ==0){ //UP 
+				else if(gEvent ==1 && upflag ==0 && keystr.SetupOn ==0){ //UP 
 					 	gEvent =0;
 						keystr.windMask = 1;
-						keystr.windLevel ++ ;
-					    if(keystr.windLevel >4){//if(keystr.windLevel >maxWind){
-						   keystr.windLevel = 1;//minWind;
+						
+					    if(keystr.windLevel >= 5){//if(keystr.windLevel >maxWind){
+						   keystr.windLevel = 0;//minWind;
 					    }
-					    
+					    keystr.windLevel ++ ;
 					        
 				}		
 			}
@@ -526,19 +531,19 @@ void TaskKeySan(void)
 				if(setupSt == 1 && gEvent==1){
 				 gEvent =0;
 				 keystr.SetupOn =1;
-				 BKLT_R=1; //turn off
+				 BKLT_TIM=0; //ON 
 			
 				 keystr.TimerOn =0;
 				 TimerBaseTim=0;
-				 upflag=0;
-				 downflag =0;
+				 upflag=1;
+				 downflag =1;
 				}
 				else if(gEvent ==1){
 					gEvent =0;
-					 BKLT_R=0; 
+					  BKLT_TIM=1; // off 
 					 keystr.SetupOn = 0;
-					 downflag = 1;
-					 upflag =1;
+					 downflag = 0;
+					 upflag =0;
 					 
 				}
 			
@@ -553,14 +558,17 @@ void TaskKeySan(void)
 				   getMinute =0 ;
 				   TimerBaseTim = keystr.TimeBaseUint ;
 				   keystr.SetupOn =0;
-				   upflag=0;
-				   BKLT_R =1;
+				   upflag=1;
+				   downflag =1;
+				   
 				}
 				else if(gEvent ==1){
 					 gEvent =0;
 					BKLT_TIM=1; //turn off
 					keystr.TimerOn =0;
-					 BKLT_R =0;
+					 upflag=0;
+				     downflag =0;
+					
 				}
 			}
 			Refurbish_Sfr();
@@ -643,18 +651,19 @@ void TaskLEDDisplay(void)
 						   }						  
 						} 
 					}	
-			   
+			#if 0   
 			if(keystr.TimeMinute==0 && keystr.TimeBaseUint==0 && keystr.TimeDecadeHour==0 && keystr.TimeHour==0 ){
 				keystr.TimerOn == 0;
 				BKLT_TIM=0;
 				
 			}
 			BKLT_TIM=0; //Tunr ON
-			
+			#endif 
+			Tm1620Dis();
 	}
-	if(keystr.windMask ==0)
+	else if(keystr.windMask ==0)
  	  Tm1620Dis();
- 	if(keystr.windMask ==1){
+ 	if(keystr.windMask ==1 && keystr.TimerOn !=1){
  		keystr.windMask = 0;
  		Tm1620_RunDisp();
  	}

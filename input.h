@@ -17,7 +17,7 @@ struct _KEY_STRUCT_
     uint8_t PowerOn : 1;     //????----???
     uint8_t RunOn: 1;       //????----???
     uint8_t windMask :1;
-    uint8_t BackLed_On: 1 ;
+    uint8_t BackLed_On: 3 ;
     
     uint8_t TimeBaseUint;    //
     uint8_t TimeHour ;

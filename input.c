@@ -27,28 +27,29 @@ void GPIO_Init(void)
 void IR_ReadData(void)
 {
     static uint8_t irflg =0;
-    static uint16_t irtimes = 0;
+    uint8_t irtimes = 0;
     irflg = irflg ^ 0x01;
- 
-   if(keystr.BackLed_On==1 && keystr.SetupOn==0 && keystr.TimerOn==0 && keystr.PowerOn==0){
-   	    if(irflg ==1){
-			if(IR_RE_DATA == 1 ){
-				     
-				 keystr.BackLed_On ==0;
-				 BKLT_R=1;
-				 BKLT_L =1;
-				
-				  
-			}
-	   }
-	   else{
-			 if(IR_RE_DATA == 0){
-			 keystr.BackLed_On=1;
-			 BKLT_R=1;
-			 BKLT_L =1;
-		}
-	}
-  }
+    
+   
+             if(IR_RE_DATA == 0){
+             	 delay_10us(100);
+                if(BKLT_R == 1 && BKLT_L == 1 && irtimes !=1){
+                
+		       	     
+						  keystr.BackLed_On=1;
+			              irtimes =0;
+						  BKLT_R = 0;
+					      BKLT_L =0;
+					      irtimes =1;
+			   	  }
+			   	   else if(irtimes !=1){
+			   	      		irtimes = 1;
+			   	      		BKLT_R = 1;
+				        	BKLT_L =1;
+				         	keystr.BackLed_On=0;
+				         	irtimes = 1;
 
-
+			   	      }
+				}	 
+			            
 }

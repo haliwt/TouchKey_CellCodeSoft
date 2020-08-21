@@ -1,6 +1,31 @@
 #include "tm1620.h"
 /******************************************************************
     *
+    *Function Name:void delay_10us(uint16_t n)
+    *Function :delay times
+    *Input Ref:
+    *Return Ref:
+    *
+*******************************************************************/
+void  delay_10us(uint16_t n)
+{
+     uint16_t i;
+  for(i=0;i<n;i++)
+  {
+       asm("nop");
+    asm("nop");
+    asm("nop");
+    asm("nop");
+    asm("nop");
+    asm("nop");
+    asm("nop");
+    asm("nop");
+    
+    } 
+}
+    
+/******************************************************************
+    *
     *Function Name:void delay_1us(uint16_t n)
     *Function :delay times
     *Input Ref:
@@ -186,6 +211,53 @@ void  Tm1620_RunDisp(void)
 
         SEG9_2 = 1;
       }
+      
+      
+      STB_TM1620 =1; 
+      STB_TM1620 =0; 
+      Tm1620SentData(OpenDisTM1620|Set12_16TM1620); 
+      STB_TM1620 =1; 
+
+
+}
+//************************************************************************
+// 函数名称：Tm1620SentData
+// 函数功能：向TM1620发数据 8位数据-1个字节的数据
+// 入口参数：要操作的数据
+// 出口参数：无
+// 技术简要：上升沿操作一位 从低位开始操作数据
+//***************************************************************************/
+void  PowerOn_RunDisp(void)
+{
+     STB_TM1620 =0 ;  
+        Tm1620SentData(ModeDisTM1620); 
+    //设置显示模式，6位8段--上电默认是7段8段
+    STB_TM1620 =1; 
+    
+    STB_TM1620=0;   
+    //Tm1620SentData(AddrAutoAdd);
+        Tm1620SentData(AddrFixed);//AddrFixed
+    //写显示，固定定制模式
+         STB_TM1620=1;
+
+      //写第五位数据  MANI RUN TIME
+     STB_TM1620=0;   
+     //指向地址8 
+      Tm1620SentData(Addr08H);
+      
+      Tm1620SentData(segNumber[0]); //写数据 //Tm1620SentData(segNumber[keystr.windLevel]); //写数据
+      SEG9_1 =0;
+    
+     //写第6位数据    MATIN RUN TIME 
+     STB_TM1620=1; 
+    
+     STB_TM1620=0;   
+     //指向地址8 
+      Tm1620SentData(Addr0AH);
+    
+      Tm1620SentData(segNumber[0]); //写数据
+      SEG9_2 = 1;
+      
       
       
       STB_TM1620 =1; 
