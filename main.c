@@ -66,6 +66,8 @@ static struct _TASK_COMPONENTS TaskComps[] =
 static int8_t TimerBaseTim=0;
 volatile unsigned char MainTime;
 volatile bit	B_MainLoop;
+	static uint8_t powerSt =0,timeupSt=0,runSt=0,timerSt=0,timedownSt=0;
+	static uint8_t killSt = 0,setupSt = 0,tempuint=1,upflag=0,downflag =0;
 /**********************************************************
 函数名称：
 函数功能：
@@ -328,8 +330,7 @@ void TaskProcess(void)
 ***********************************************************/
 void TaskKeySan(void)
 {
-	static uint8_t powerSt =0,timeupSt=0,runSt=0,timerSt=0,timedownSt=0;
-	static uint8_t killSt = 0,setupSt = 0,tempuint=1,upflag=0,downflag =0;
+
 	
 	switch(KeyID){
 		
@@ -420,44 +421,51 @@ void TaskKeySan(void)
 	 case keyflag_KILL:
 	
 			killSt =killSt ^ 0x01;
+			
 			BKLT_L =1;
 			BKLT_R =1;
 				keystr.windMask =1;
-				if(killSt ==1 && gEvent==1){
+				if(killSt ==1 && gEvent ==1){
 					gEvent =0;
-				 	
-					keystr.KillOn =1;
+					if(keystr.RunOn==1)keystr.KillOn = 2;
+	
+			�		
 				   
 				}
-				else if(gEvent ==1){
+				else if(gEvent==1){
 					gEvent =0;
-					
-					keystr.KillOn = 0;
+					killSt =0;
+					 keystr.KillOn = 0;
+					if(keystr.KillOn==2)keystr.KillOn = 1;
+					 killSt =0;
 				}
 	break;
 	
-	case keyflag_POWER :
+	case keyflag_POWER ://只是开背光，和关背光
 	
-			
-			    powerSt =powerSt ^ 0x1;
-			    if(powerSt ==1 && gEvent ==1){
+			   // powerSt =powerSt ^ 0x1;
+			    
+				keystr.windMask = 1;
+				
+			    if(powerSt ==0 && gEvent ==1){
 					gEvent =0;
 				  	BKLT_L =1;
 				    BKLT_R =1;
 				    keystr.PowerOn =1;
+					powerSt ++;
 					upflag=0;
 					
 			    }
-			    else if(gEvent==1){
+			    else if(gEvent==1 && powerSt == 1){
+					powerSt =0;
 					gEvent =0;
 			        BKLT_R =0;
 				    BKLT_L= 0;
-				    keystr.windMask = 1;
+				    powerSt =0;
 				    keystr.PowerOn =0;
-				    keystr.windLevel=0;
-				    keystr.BackLed_On = 1;
-
-			    }
+					keystr.RunOn = 0;
+					keystr.KillOn =0 ;
+				}
 				
 				
 				
@@ -481,11 +489,9 @@ void TaskKeySan(void)
 						if(keystr.TimeMinute==6){ 
 							keystr.TimeMinute =0;
 							keystr.TimeDecadeHour ++;
-							if(keystr.TimeDecadeHour ==10){ //小时
-								keystr.TimeDecadeHour =0;
-								keystr.TimeHour ++;
-								if(keystr.TimeHour == 2){
-									if(keystr.TimeDecadeHour==4){
+							{
+							   if(keystr.TimeHour == 2){
+									if(keystr.TimeDecadeHour == 4){
 										keystr.TimeBaseUint=0;
 										keystr.TimeMinute=0;
 										keystr.TimeDecadeHour=0;
@@ -493,12 +499,18 @@ void TaskKeySan(void)
 									}
 
 								}
+							   else{
+									if(keystr.TimeDecadeHour ==10){ //小时
+										keystr.TimeDecadeHour =0;
+										keystr.TimeHour ++;
+									
+									}
+							    }
 							}
-						}
-					}	
+						}	
+					}		
 						
-						
-			}
+		}
 		else if(gEvent ==1 && upflag ==0 && keystr.SetupOn ==0){ //UP 
 				gEvent =0;
 				keystr.windMask = 1;
@@ -516,18 +528,20 @@ void TaskKeySan(void)
 				runSt = runSt ^ 0x01;
 				BKLT_L =1;
 				BKLT_R =1;
-			
+			    keystr.windMask = 1;
 				if(runSt ==1 && gEvent == 1){
 					gEvent =0;
-			       
+			        if( keystr.KillOn ==1)keystr.KillOn = 2;
+					else keystr.KillOn = 1;
 					keystr.RunOn =1;
-				
+				    
 				
 				}
 				else if(gEvent ==1){
 					gEvent =0 ;
-					
+					keystr.KillOn = 0;
 					keystr.RunOn =0;
+					//keystr.windLevel=0;
 				}
 			  
 			
@@ -553,6 +567,8 @@ void TaskKeySan(void)
 					 keystr.SetupOn = 0;
 					 downflag = 0;
 					 upflag =0;
+					 BKLT_TIM=1; //turn off
+					 keystr.TimerOn =0;
 					 
 				}
 			
