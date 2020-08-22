@@ -337,14 +337,8 @@ void TaskKeySan(void)
 	//KEY_DOWN //0x08
 			
 				timedownSt = timedownSt ^ 0x01;
-				if(timedownSt ==1 && gEvent ==1){
-					BKLT_L =0; //ON 
-					
-				}
-				else if(gEvent ==1){
-					BKLT_L =1; //OFF
-					
-				}
+				BKLT_L =1;
+			    BKLT_R =1;
 				if(keystr.SetupOn ==1 && gEvent ==1){
 					   gEvent =0;
 						if(keystr.TimeBaseUint == 0)keystr.TimeBaseUint =1;
@@ -425,18 +419,19 @@ void TaskKeySan(void)
 	 
 	 case keyflag_KILL:
 	
-			
-				killSt =killSt ^ 0x01;
+			killSt =killSt ^ 0x01;
+			BKLT_L =1;
+			BKLT_R =1;
 				keystr.windMask =1;
 				if(killSt ==1 && gEvent==1){
 					gEvent =0;
 				 	
 					keystr.KillOn =1;
-				    BKLT_TIM= 0; //Turn On
+				   
 				}
 				else if(gEvent ==1){
 					gEvent =0;
-					BKLT_TIM= 1; //Turn off
+					
 					keystr.KillOn = 0;
 				}
 	break;
@@ -470,71 +465,68 @@ void TaskKeySan(void)
 	
 	case keyflag_UP:
 			
-		
-				 timeupSt = timeupSt ^ 0x01;
-				 if(timeupSt ==1 && gEvent ==1){
-			      		 BKLT_TIM=0; //Turn On
-						
-				  }
-				 else if(gEvent ==1){
-					  BKLT_TIM= 1; //Turn off
-					 
-				}
-				if(keystr.SetupOn ==1 && gEvent ==1 && upflag ==1){
-						gEvent =0;
-					
-						keystr.TimeBaseUint ++ ;
-						if(keystr.TimeBaseUint == 10){
-							keystr.TimeBaseUint=0;
-							keystr.TimeMinute++;
-							if(keystr.TimeMinute==6){ 
-								keystr.TimeMinute =0;
-								keystr.TimeDecadeHour ++;
-								if(keystr.TimeDecadeHour ==10){ //小时
-									keystr.TimeDecadeHour =0;
-									keystr.TimeHour ++;
-									if(keystr.TimeHour == 2){
-										if(keystr.TimeDecadeHour==4){
-											keystr.TimeBaseUint=0;
-											keystr.TimeMinute=0;
-											keystr.TimeDecadeHour=0;
-											keystr.TimeHour=0;
-										}
 
+		timeupSt = timeupSt ^ 0x01;
+		
+		BKLT_L =1;
+		BKLT_R =1;
+		
+		if(keystr.SetupOn ==1 && gEvent ==1 && upflag ==1){
+					gEvent =0;
+				
+					keystr.TimeBaseUint ++ ;
+					if(keystr.TimeBaseUint == 10){
+						keystr.TimeBaseUint=0;
+						keystr.TimeMinute++;
+						if(keystr.TimeMinute==6){ 
+							keystr.TimeMinute =0;
+							keystr.TimeDecadeHour ++;
+							if(keystr.TimeDecadeHour ==10){ //小时
+								keystr.TimeDecadeHour =0;
+								keystr.TimeHour ++;
+								if(keystr.TimeHour == 2){
+									if(keystr.TimeDecadeHour==4){
+										keystr.TimeBaseUint=0;
+										keystr.TimeMinute=0;
+										keystr.TimeDecadeHour=0;
+										keystr.TimeHour=0;
 									}
+
 								}
 							}
-						}	
-							
-							
-				}
-				
-				else if(gEvent ==1 && upflag ==0 && keystr.SetupOn ==0){ //UP 
-					 	gEvent =0;
-						keystr.windMask = 1;
+						}
+					}	
 						
-					    if(keystr.windLevel >= 5){//if(keystr.windLevel >maxWind){
-						   keystr.windLevel = 0;//minWind;
-					    }
-					    keystr.windLevel ++ ;
-					        
-				}		
+						
+			}
+		else if(gEvent ==1 && upflag ==0 && keystr.SetupOn ==0){ //UP 
+				gEvent =0;
+				keystr.windMask = 1;
+				
+				if(keystr.windLevel >= 5){//if(keystr.windLevel >maxWind){
+					keystr.windLevel = 0;//minWind;
+				}
+				keystr.windLevel ++ ;
+					
+		}		
 		break;
 		
 		case keyflag_RUN:
 			
 				runSt = runSt ^ 0x01;
+				BKLT_L =1;
+				BKLT_R =1;
 			
 				if(runSt ==1 && gEvent == 1){
 					gEvent =0;
-			       BKLT_TIM=0; //Turn On
+			       
 					keystr.RunOn =1;
 				
-					upflag=0;
+				
 				}
 				else if(gEvent ==1){
 					gEvent =0 ;
-					BKLT_TIM=1; //turn off
+					
 					keystr.RunOn =0;
 				}
 			  
@@ -544,19 +536,20 @@ void TaskKeySan(void)
 		case keyflag_SETUP:
 			
 				setupSt  = setupSt ^ 0x01;
+				BKLT_L =1;
+				BKLT_R =1;
+				
 				if(setupSt == 1 && gEvent==1){
-				 gEvent =0;
-				 keystr.SetupOn =1;
-				 BKLT_TIM=0; //ON 
-			
-				 keystr.TimerOn =0;
-				 TimerBaseTim=0;
-				 upflag=1;
-				 downflag =1;
+					gEvent =0;
+					keystr.SetupOn =1;
+					keystr.TimerOn =0;
+					TimerBaseTim=0;
+					upflag=1;
+					downflag =1;
 				}
 				else if(gEvent ==1){
 					gEvent =0;
-					  BKLT_TIM=1; // off 
+					
 					 keystr.SetupOn = 0;
 					 downflag = 0;
 					 upflag =0;
@@ -567,6 +560,8 @@ void TaskKeySan(void)
 		
 		case 	keyflag_TIMER:
 			
+			    BKLT_L =1;
+				BKLT_R =1;
 				timerSt = timerSt ^ 0x01;
 				if(timerSt ==1 && gEvent ==1){
 				   gEvent =0;
@@ -579,7 +574,7 @@ void TaskKeySan(void)
 				   downflag =1;
 				   
 				}
-				else if(gEvent ==1){
+				else if(gEvent ==1 && timerSt == 0){
 					 gEvent =0;
 					BKLT_TIM=1; //turn off
 					keystr.TimerOn =0;
@@ -681,12 +676,16 @@ void TaskLEDDisplay(void)
 			
 			BKLT_TIM=0; //Tunr ON
 			Tm1620Dis();
+			delay_10us(10);
 	}
-	else if(keystr.windMask ==0)
+	else if(keystr.windMask ==0){
  	  Tm1620Dis();
+	delay_10us(10);
+	}
  	if(keystr.windMask ==1 && keystr.TimerOn !=1){
  		keystr.windMask = 0;
  		Tm1620_RunDisp();
+		 delay_10us(10);
  	}
    
 }
