@@ -19,7 +19,7 @@
 
 
 #define TASK_NUM   (5)                  //  这里定义的任务数为4，表示有4个任务会使用此定时器定时。
- uint8_t gBaudTime = 0;
+
  static uint8_t runTimes ;
  static uint8_t gEvent = 0;      //g = globe
  static uint16_t getMinute=0;
@@ -138,7 +138,7 @@ void Init28_System()
 	
 	PIE2 = 0;
 	PIE1 = 0x02; //
-	PR2 = 28 ;//PR2 = 250;				//8M下将TMR2设置为125us中断,104us
+	PR2 = 208 ;//PR2 = 250;				//8M下将TMR2设置为125us中断,104us,波特率9600bps
 	T2CON = 4;				//使能定时器2
 	
 	
@@ -268,7 +268,7 @@ void KeyServer()
 ***********************************************************/
 void main()
 {
-	
+	static uint16_t irtimes =0;
 	Init_System();
 	PowerOn_RunDisp();
 
@@ -278,12 +278,22 @@ void main()
 	    if(runTimes==0){
 			 runTimes++;
 	         Init28_System();
-			 WriteByte(keystr.SendData | 0x88) ;
-			goto Next;
+			 WriteByte(0xAA) ;
+		
+			 WriteByte(0x23) ;
+		
+			 WriteByte(0x45) ;
+		
+			 WriteByte(0xAB) ;
+			 delay_10us(100);
+			 goto Next;
 		 }
 		if(B_MainLoop)
 		{
-Next:		Init_System();
+Next:	    runTimes = 0x04;
+             irtimes ++;
+			 if(irtimes==1000)  runTimes=0; 
+            Init_System();
             B_MainLoop = 0;
             runTimes=0;
 			CLRWDT();
@@ -747,16 +757,13 @@ void interrupt Isr_Timer()
 	static uint16_t seconds=0,minutes=0, ptpwm_flag=0;
 	uint8_t i;
 
-	//if(TMR2IF)				//若只使能了一个中断源,可以略去判断
-	//{
+	if(TMR2IF)				//若只使能了一个中断源,可以略去判断
+	{
 		TMR2IF = 0;
-	  //  runTimes =1;
-		asm("nop");
-		asm("nop");
-		asm("nop");///add 
+	    gBaudTime=1;
 		
 		
-	//}	
+	}	
 	
 
 

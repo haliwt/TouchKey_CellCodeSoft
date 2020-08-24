@@ -1,4 +1,5 @@
 #include "usart.h"
+
 static uint8_t interflag;
  static uint8_t  x=0;
 static void wait_int(void);
@@ -115,12 +116,12 @@ void WriteByte( uint8_t Data)
 {
    
 	int8_t i =8,pro;
-	//  wait_int();
+	  wait_int();
 	
 		
 		PortTx =0;
 		
-		delay_14us(1);//wait_int();
+		wait_int();//delay_14us(1);
 	
 	   
 	  while(i--)
@@ -132,13 +133,13 @@ void WriteByte( uint8_t Data)
              else
                PortTx=0;        // 0
            
-				delay_14us(1);//wait_int();
+				wait_int();//delay_14us(1);//
 				 Data = Data >> 1;
 			}	
 			
 		PortTx= 1;
-			//	delay_10us(1);
-	   delay_14us(1);//wait_int();
+	    wait_int();
+	  // delay_14us(1);//wait_int();
 		
 }
 

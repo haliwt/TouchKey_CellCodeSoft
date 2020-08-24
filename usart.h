@@ -7,8 +7,8 @@
 
 #define PortTx    RA1
 
-extern uint8_t gBaudTime;  //g--globe全局变量 
-
+volatile uint8_t gBaudTime;  //g--globe全局变量 
+ //extern volatile uint8_t gBaudTime ;  //WT.EDIT 2020.08.24//
 void SendData_0(void);
 void SendData_1(void);
 
