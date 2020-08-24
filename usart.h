@@ -16,7 +16,7 @@ void WriteByte( uint8_t sdata ) ;//波特率9600
 
 void USART_SendData(uint8_t data);//模拟串口函数
 
-uint8_t BCC(uint8_t *sbytes,uint8_t width);
+uint8_t BCC(void);
 
 void VirtualCOM_ByteSend(uint8_t Data);
 

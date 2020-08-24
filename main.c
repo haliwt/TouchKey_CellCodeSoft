@@ -278,21 +278,15 @@ void main()
 	    if(runTimes==0){
 			 runTimes++;
 	         Init28_System();
-			 WriteByte(0xAA) ;
-		
-			 WriteByte(0x23) ;
-		
-			 WriteByte(0x45) ;
-		
-			 WriteByte(0xAB) ;
-			 delay_10us(100);
+			 USART_SendData(0);
+   
 			 goto Next;
-		 }
+		}
 		if(B_MainLoop)
 		{
 Next:	    runTimes = 0x04;
              irtimes ++;
-			 if(irtimes==1000)  runTimes=0; 
+			 if(irtimes==3000)  runTimes=0; 
             Init_System();
             B_MainLoop = 0;
             runTimes=0;
@@ -619,8 +613,9 @@ void TaskKeySan(void)
 				}
 			}
 			Refurbish_Sfr();
-			keystr.SendData = (keystr.PowerOn << 6 | keystr.RunOn << 5 | keystr.KillOn << 4 | keystr.windLevel)  ;
-
+			keystr.SendSwitchData = keystr.PowerOn << 7 | keystr.RunOn << 6 | keystr.KillOn << 5   ;
+            keystr.SendWindData  = keystr.windLevel;
+			keystr.SendBCCdata =BCC();
 }
 /***********************************************************
 	*
