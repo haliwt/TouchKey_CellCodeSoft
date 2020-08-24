@@ -268,7 +268,7 @@ void KeyServer()
 ***********************************************************/
 void main()
 {
-	static uint16_t irtimes =0;
+	static uint8_t irtimes =0;
 	Init_System();
 	PowerOn_RunDisp();
 
@@ -431,48 +431,41 @@ void TaskKeySan(void)
 				keystr.windMask =1;
 				if(killSt ==1 && gEvent ==1){
 					gEvent =0;
-					if(keystr.RunOn==1)keystr.KillOn = 2;
-	
-			�		
+					
+				 keystr.KillOn = 1;
+				   keystr.RunStateNumber ++;
 				   
 				}
 				else if(gEvent==1){
 					gEvent =0;
-					killSt =0;
-					 keystr.KillOn = 0;
-					if(keystr.KillOn==2)keystr.KillOn = 1;
-					 killSt =0;
+				    keystr.KillOn = 0;
+					keystr.RunStateNumber --;
+					if(keystr.RunStateNumber <=0) keystr.RunStateNumber =0;
+					 
 				}
 	break;
 	
 	case keyflag_POWER ://只是开背光，和关背光
 	
-			   // powerSt =powerSt ^ 0x1;
-			    
-				keystr.windMask = 1;
-				
-			    if(powerSt ==0 && gEvent ==1){
+			    powerSt =powerSt ^ 0x1;
+			    if(powerSt ==1 && gEvent ==1){
 					gEvent =0;
 				  	BKLT_L =1;
 				    BKLT_R =1;
 				    keystr.PowerOn =1;
-					powerSt ++;
 					upflag=0;
 					
 			    }
-			    else if(gEvent==1 && powerSt == 1){
-					powerSt =0;
+			    else if(gEvent==1){
+		
 					gEvent =0;
 			        BKLT_R =0;
 				    BKLT_L= 0;
-				    powerSt =0;
+
 				    keystr.PowerOn =0;
 					keystr.RunOn = 0;
-					keystr.KillOn =0 ;
+				
 				}
-				
-				
-				
 	break ;
 	
 	case keyflag_UP:
@@ -535,17 +528,17 @@ void TaskKeySan(void)
 			    keystr.windMask = 1;
 				if(runSt ==1 && gEvent == 1){
 					gEvent =0;
-			        if( keystr.KillOn ==1)keystr.KillOn = 2;
-					else keystr.KillOn = 1;
+			        
 					keystr.RunOn =1;
-				    
+				    keystr.RunStateNumber ++;
 				
 				}
 				else if(gEvent ==1){
 					gEvent =0 ;
-					keystr.KillOn = 0;
+				
 					keystr.RunOn =0;
-					//keystr.windLevel=0;
+					keystr.RunStateNumber --;
+					if(keystr.RunStateNumber <=0)	keystr.RunStateNumber =0;
 				}
 			  
 			
@@ -696,20 +689,15 @@ void TaskLEDDisplay(void)
 					}	
 			
 			BKLT_TIM=0; //Tunr ON
-			Tm1620Dis();
-			delay_10us(10);
+		
 	}
-	else if(keystr.windMask ==0){
- 	  Tm1620Dis();
-	delay_10us(10);
-	}
- 	if(keystr.windMask ==1 && keystr.TimerOn !=1){
- 		keystr.windMask = 0;
- 		Tm1620_RunDisp();
-		 delay_10us(10);
+	Tm1620Dis();
+	
+ //	Tm1620_RunDisp();
+		
  	}
    
-}
+
 /***********************************************************
 	*
 	*Function Name: void TaskReceiveIR(void)
@@ -760,10 +748,6 @@ void interrupt Isr_Timer()
 		
 	}	
 	
-
-
-    if(runTimes !=1)
-	{
 	if(T0IF)
 	{
 	//---------------------------------------
@@ -826,7 +810,7 @@ void interrupt Isr_Timer()
 
 	}
 	
-	}
+	
 }
 	
 }

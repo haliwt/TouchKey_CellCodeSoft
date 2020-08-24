@@ -30,6 +30,7 @@ struct _KEY_STRUCT_
     uint8_t SendWindData ;
     uint8_t SendBCCdata;
     uint8_t TimerTim; 
+    uint8_t RunStateNumber;
 };
 
 struct  _KEY_STRUCT_   keystr;

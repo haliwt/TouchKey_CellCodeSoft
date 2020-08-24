@@ -33,15 +33,16 @@ void USART_SendData(uint8_t data)
 ******************************************************************************/
 uint8_t BCC(void)
 {
-     uint8_t sbytes[3];
+     uint8_t sbytes[4];
 	 uint8_t i;
 	 sbytes[0]=0xAA;
 	 uint8_t tembyte = sbytes[0];
 	 
+	 sbytes[1]=keystr.SendSwitchData;
+	 sbytes[2]=keystr.SendWindData;
+     sbytes[3]=0x00;
 	 
-	 sbytes[1]=keystr.SendWindData;
-     sbytes[2]=0x00;
-    for (i = 1; i <3; i++) {
+    for (i = 1; i <4; i++) {
         tembyte ^= sbytes[i];
     }
     return tembyte;
