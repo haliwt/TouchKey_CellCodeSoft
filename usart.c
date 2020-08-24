@@ -88,14 +88,10 @@ void WriteByte( uint8_t Data)
    
 	int8_t i =8,pro;
 	  wait_int();
-	
-		
-		PortTx =0;
-		
-		wait_int();//delay_14us(1);
-	
-	   
-	  while(i--)
+	  wait_int();
+	  PortTx =0;
+	 wait_int();//delay_14us(1);
+	 while(i--)
 		{
 			 
 			
@@ -110,6 +106,7 @@ void WriteByte( uint8_t Data)
 			
 		PortTx= 1;
 	    wait_int();
+		wait_int();
 	  // delay_14us(1);//wait_int();
 		
 }
