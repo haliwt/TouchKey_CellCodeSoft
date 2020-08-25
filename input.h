@@ -27,7 +27,8 @@ struct _KEY_STRUCT_
     uint8_t TimeSetUp;
     uint8_t TimeSetDown;
     uint8_t SendSwitchData ;
-    uint8_t SendWindData ;
+    uint8_t SendWindDataHigh ;
+    uint8_t SendWindDataLow;
     uint8_t SendBCCdata;
     uint8_t TimerTim; 
     uint8_t RunStateNumber;

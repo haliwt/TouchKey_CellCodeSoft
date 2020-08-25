@@ -66,8 +66,7 @@ static struct _TASK_COMPONENTS TaskComps[] =
 static int8_t TimerBaseTim=0;
 volatile unsigned char MainTime;
 volatile bit	B_MainLoop;
-	static uint8_t powerSt =0,timeupSt=0,runSt=0,timerSt=0,timedownSt=0;
-	static uint8_t killSt = 0,setupSt = 0,tempuint=1,upflag=0,downflag =0;
+	
 /**********************************************************
 函数名称：
 函数功能：
@@ -138,7 +137,7 @@ void Init28_System()
 	
 	PIE2 = 0;
 	PIE1 = 0x02; //
-	PR2 = 208 ;//PR2 = 250;				//8M下将TMR2设置为125us中断,104us,波特率9600bps
+	PR2 = 208 ;//104uS .PR2 = 250;	//8M下将TMR2设置为125us中断,416.6us,波特率2400bps
 	T2CON = 4;				//使能定时器2
 	
 	
@@ -195,7 +194,7 @@ void Refurbish_Sfr()
 void KeyServer()
 {
 	
-	 
+
 	static unsigned int KeyOldFlag = 0;
 	unsigned int i = (unsigned int)((KeyFlag[1]<<8) | KeyFlag[0]);
 	if(i)
@@ -334,7 +333,8 @@ void TaskProcess(void)
 ***********************************************************/
 void TaskKeySan(void)
 {
-
+	static uint8_t powerSt =0,timeupSt=0,runSt=0,timerSt=0,timedownSt=0;
+	static uint8_t killSt = 0,setupSt = 0,tempuint=1,upflag=0,downflag =0;
 	
 	switch(KeyID){
 		
@@ -607,7 +607,26 @@ void TaskKeySan(void)
 			}
 			Refurbish_Sfr();
 			keystr.SendSwitchData = keystr.PowerOn << 7 | keystr.RunOn << 6 | keystr.KillOn << 5   ;
-            keystr.SendWindData  = keystr.windLevel;
+			if(keystr.windLevel==1){
+				keystr.SendWindDataHigh= 0x01;
+				keystr.SendWindDataLow = 0x90;
+			}
+			else if(keystr.windLevel==2){
+				keystr.SendWindDataHigh= 0x01;
+				keystr.SendWindDataLow = 0xC2;
+			}
+			else if(keystr.windLevel==3){
+				keystr.SendWindDataHigh= 0x02;
+				keystr.SendWindDataLow = 0x26;
+			}
+			else if(keystr.windLevel==4){
+				keystr.SendWindDataHigh= 0x02;
+				keystr.SendWindDataLow = 0x58;
+			}
+			else if(keystr.windLevel==5){
+				keystr.SendWindDataHigh= 0x02;
+				keystr.SendWindDataLow = 0x58;
+			}
 			keystr.SendBCCdata =BCC();
 }
 /***********************************************************
