@@ -274,7 +274,8 @@ void main()
 	while(1)
 	{
 	   
-	    if(runTimes==0){
+	    if(runTimes==0)
+		{
 			 runTimes++;
 	         Init28_System();
 			 USART_SendData(0);
@@ -284,8 +285,8 @@ void main()
 		if(B_MainLoop)
 		{
 Next:	    runTimes = 0x04;
-             irtimes ++;
-			 if(irtimes==3000)  runTimes=0; 
+            irtimes ++;
+			if(irtimes==3000)  runTimes=0; 
             Init_System();
             B_MainLoop = 0;
             runTimes=0;
@@ -298,8 +299,8 @@ Next:	    runTimes = 0x04;
 			TaskLEDDisplay();
 			IR_ReadData();
 		}
-		
-		}
+	
+	}
 }
 /***********************************************************
 	*
@@ -433,14 +434,22 @@ void TaskKeySan(void)
 					gEvent =0;
 					
 				 keystr.KillOn = 1;
-				   keystr.RunStateNumber ++;
+				   	if(keystr.RunOn==1)keystr.RunStateNumber=2;
+				    else {
+						 keystr.RunStateNumber =3;
+					}
 				   
 				}
 				else if(gEvent==1){
 					gEvent =0;
 				    keystr.KillOn = 0;
-					keystr.RunStateNumber --;
-					if(keystr.RunStateNumber <=0) keystr.RunStateNumber =0;
+					
+					if(keystr.RunOn ==1) keystr.RunStateNumber =1;
+					else { 
+						  
+						  keystr.RunStateNumber=0;
+						  
+					}
 					 
 				}
 	break;
@@ -452,8 +461,8 @@ void TaskKeySan(void)
 					gEvent =0;
 				  	BKLT_L =1;
 				    BKLT_R =1;
-				    keystr.PowerOn =1;
-					upflag=0;
+				 //   keystr.PowerOn =1;
+				//	upflag=0;
 					
 			    }
 			    else if(gEvent==1){
@@ -476,7 +485,7 @@ void TaskKeySan(void)
 		BKLT_L =1;
 		BKLT_R =1;
 		
-		if(keystr.SetupOn ==1 && gEvent ==1 && upflag ==1){
+		if(keystr.SetupOn ==1 && gEvent ==1 ){
 					gEvent =0;
 				
 					keystr.TimeBaseUint ++ ;
@@ -508,7 +517,7 @@ void TaskKeySan(void)
 					}		
 						
 		}
-		else if(gEvent ==1 && upflag ==0 && keystr.SetupOn ==0){ //UP 
+		else if(gEvent ==1  && keystr.SetupOn ==0){ //UP 
 				gEvent =0;
 				keystr.windMask = 1;
 				
@@ -530,15 +539,17 @@ void TaskKeySan(void)
 					gEvent =0;
 			        
 					keystr.RunOn =1;
-				    keystr.RunStateNumber ++;
-				
+					if(keystr.KillOn ==1)keystr.RunStateNumber=2;
+					else 
+						 keystr.RunStateNumber=1; //1--代表RUN运行
 				}
 				else if(gEvent ==1){
 					gEvent =0 ;
 				
 					keystr.RunOn =0;
-					keystr.RunStateNumber --;
-					if(keystr.RunStateNumber <=0)	keystr.RunStateNumber =0;
+					if(keystr.KillOn ==1)keystr.RunStateNumber=3; //3---代表杀菌功能开启
+					else 
+						 keystr.RunStateNumber=0;
 				}
 			  
 			
@@ -606,27 +617,29 @@ void TaskKeySan(void)
 				}
 			}
 			Refurbish_Sfr();
-			keystr.SendSwitchData = keystr.PowerOn << 7 | keystr.RunOn << 6 | keystr.KillOn << 5   ;
+			keystr.SendSwitchData =  1<<7 | keystr.PowerOn << 6 | keystr.RunOn << 5 | keystr.KillOn<< 4  ;
 			if(keystr.windLevel==1){
-				keystr.SendWindDataHigh= 0x01;
-				keystr.SendWindDataLow = 0x90;
+				//keystr.SendWindDataHigh= 0x01;
+				keystr.SendWindDataLow = 0x01;
 			}
 			else if(keystr.windLevel==2){
-				keystr.SendWindDataHigh= 0x01;
-				keystr.SendWindDataLow = 0xC2;
+				//keystr.SendWindDataHigh= 0x01;
+				keystr.SendWindDataLow = 0x02;
 			}
 			else if(keystr.windLevel==3){
-				keystr.SendWindDataHigh= 0x02;
-				keystr.SendWindDataLow = 0x26;
+			//	keystr.SendWindDataHigh= 0x02;
+				keystr.SendWindDataLow = 0x03;
 			}
 			else if(keystr.windLevel==4){
-				keystr.SendWindDataHigh= 0x02;
-				keystr.SendWindDataLow = 0x58;
+				//keystr.SendWindDataHigh= 0x02;
+				keystr.SendWindDataLow = 0x04;
 			}
 			else if(keystr.windLevel==5){
-				keystr.SendWindDataHigh= 0x02;
-				keystr.SendWindDataLow = 0x58;
+				//keystr.SendWindDataHigh= 0x02;
+				keystr.SendWindDataLow = 0x05;
 			}
+			keystr.SendWindDataHigh = (keystr.SendSwitchData |keystr.windLevel) & 0xff;
+									   
 			keystr.SendBCCdata =BCC();
 }
 /***********************************************************

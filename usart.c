@@ -15,11 +15,11 @@ void USART_SendData(uint8_t data)
 {
     
     WriteByte(0xAA) ;  //报文头 AB
-	WriteByte(keystr.SendSwitchData) ; //控制参数
-    WriteByte(keystr.SendWindDataLow) ; //风速量---低字节
+	//WriteByte(keystr.SendSwitchData) ; //控制参数
+    //WriteByte(keystr.SendWindDataLow) ; //风速量---低字节
 	WriteByte(keystr.SendWindDataHigh) ; //风速量--高字节
 	WriteByte(keystr.SendBCCdata) ; //BCC校验码
-	WriteByte(0xAB) ; //报文尾 ：结束码 AB
+	//WriteByte(0xAB) ; //报文尾 ：结束码 AB
 	
 	
 }
@@ -33,18 +33,17 @@ void USART_SendData(uint8_t data)
 ******************************************************************************/
 uint8_t BCC(void)
 {
-     uint8_t sbytes[4];
+     uint8_t sbytes[2];
 	 uint8_t i;
 	 sbytes[0]=0xAA;
-	 uint8_t tembyte = sbytes[0];
+	 uint8_t tembyte ;//= sbytes[0];
 	 
-	 sbytes[1]=keystr.SendSwitchData;
-	 sbytes[2]=keystr.SendWindDataLow;
-     sbytes[3]=keystr.SendWindDataHigh;
-	 
-    for (i = 1; i <4; i++) {
-        tembyte ^= sbytes[i];
-    }
+	 sbytes[1]=(keystr.SendSwitchData | keystr.SendWindDataLow ) & 0xff;
+	 //sbytes[2]=keystr.SendWindDataLow;
+     //sbytes[3]=keystr.SendWindDataHigh;
+
+        tembyte =  sbytes[0]^ sbytes[1];
+    
     return tembyte;
 
 }

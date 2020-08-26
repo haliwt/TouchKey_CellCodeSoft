@@ -143,7 +143,7 @@ void Tm1620Dis(void)
       Tm1620SentData(Addr08H);
       
       Tm1620SentData(segNumber[keystr.RunStateNumber]); //写数据 //Tm1620SentData(segNumber[keystr.windLevel]); //写数据
-      if(keystr.KillOn== 1 || keystr.KillOn== 4 || keystr.KillOn== 7){
+      if(keystr.RunStateNumber== 1 || keystr.RunStateNumber== 4 || keystr.RunStateNumber== 7){
          SEG9_1 =0;
       }
       else {
