@@ -52,11 +52,11 @@ const unsigned char Table_KeyEnable[3][4] = {
 const unsigned char Table_KeyDown[] = {
 	8,				//按键1灵敏度设定值  //timer key 
 	6,				//按键2灵敏度设定值  //up key
-	6,				//按键3灵敏度设定值  //down  key
-	10,//10,				//按键4灵敏度设定值 //run key
+	7,				//按键3灵敏度设定值  //down  key
+	9,//10,				//按键4灵敏度设定值 //run key
 	10,//10,				//按键5灵敏度设定值  //setup key 
 	12,//12,				//按键6灵敏度设定值   // kill key
-	14,//14,				//按键7灵敏度设定值   // power key 
+	24,//14,				//按键7灵敏度设定值   // power key 
 	11,				//按键8灵敏度设定值
 	12,				//按键9灵敏度设定值
 	14,				//按键10灵敏度设定值

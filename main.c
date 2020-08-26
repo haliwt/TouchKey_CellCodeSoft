@@ -409,14 +409,13 @@ void TaskKeySan(void)
 					}	
 				}    
 										
-				else if(gEvent ==1 && downflag ==0 && keystr.SetupOn ==0){ //风速递减
+				else if(gEvent ==1 && keystr.SetupOn ==0){ //风速递减
 						gEvent =0;
-						keystr.windMask =1;
-						if(keystr.windLevel <=0)
-						    keystr.windLevel = 1;
+						keystr.windMask =0;
+						if(keystr.windLevel <=0) keystr.windLevel = 0;
 						else {
 						     keystr.windLevel --;//minWind;
-						     if(keystr.windLevel == 0)keystr.windLevel = 1;
+						     if(keystr.windLevel <= 0)keystr.windLevel = 0;
 					     }
 				}
 			   
@@ -473,6 +472,7 @@ void TaskKeySan(void)
 
 				    keystr.PowerOn =0;
 					keystr.RunOn = 0;
+					keystr.windLevel = 0;
 				
 				}
 	break ;
@@ -517,14 +517,15 @@ void TaskKeySan(void)
 					}		
 						
 		}
-		else if(gEvent ==1  && keystr.SetupOn ==0){ //UP 
+		else if(gEvent ==1  && keystr.SetupOn ==0){ //UP 风速调节
 				gEvent =0;
 				keystr.windMask = 1;
 				
-				if(keystr.windLevel >= 5){//if(keystr.windLevel >maxWind){
+				keystr.windLevel ++ ;
+				if(keystr.windLevel > 5){//if(keystr.windLevel >maxWind){
 					keystr.windLevel = 0;//minWind;
 				}
-				keystr.windLevel ++ ;
+				
 					
 		}		
 		break;
@@ -542,6 +543,7 @@ void TaskKeySan(void)
 					if(keystr.KillOn ==1)keystr.RunStateNumber=2;
 					else 
 						 keystr.RunStateNumber=1; //1--代表RUN运行
+					if(keystr.windLevel ==0)keystr.windLevel = 1;
 				}
 				else if(gEvent ==1){
 					gEvent =0 ;
@@ -550,6 +552,7 @@ void TaskKeySan(void)
 					if(keystr.KillOn ==1)keystr.RunStateNumber=3; //3---代表杀菌功能开启
 					else 
 						 keystr.RunStateNumber=0;
+					keystr.windLevel = 0;
 				}
 			  
 			
@@ -617,8 +620,12 @@ void TaskKeySan(void)
 				}
 			}
 			Refurbish_Sfr();
-			keystr.SendSwitchData =  1<<7 | keystr.PowerOn << 6 | keystr.RunOn << 5 | keystr.KillOn<< 4  ;
-			if(keystr.windLevel==1){
+			keystr.SendSwitchData =  1<<7 | keystr.PowerOn << 6 | 1 << 5 | keystr.KillOn<< 4  ;
+			if(keystr.windLevel==0){
+				//keystr.SendWindDataHigh= 0x01;
+				keystr.SendWindDataLow = 0x00;
+			}
+			else if(keystr.windLevel==0x01){
 				//keystr.SendWindDataHigh= 0x01;
 				keystr.SendWindDataLow = 0x01;
 			}
